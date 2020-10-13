@@ -1,22 +1,45 @@
 package com.cosc436002fitzarr.brm.models.user;
 
 
-import java.util.ArrayList;
+import com.cosc436002fitzarr.brm.enums.SiteRole;
+import com.cosc436002fitzarr.brm.models.Entity;
+import com.cosc436002fitzarr.brm.models.EntityTrail;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-public class User {
+@Document(collection = "user")
+public class User implements Entity {
+    private String id;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
+    private List<EntityTrail> entityTrail;
+    private String publisherId;
     private SiteRole siteRole;
     private String firstName;
     private String lastName;
+
+    @Indexed(unique = true)
     private String username;
+
+    @Indexed(unique = true)
     private String email;
+
     private String phone;
     private String hashPassword;
-    private List<String> associatedSiteIds;
+    // TODO: We'll worry about this after we finish base user setup and login/register stuff.
+    // private List<String> associatedSiteIds;
 
-    public User (SiteRole siteRole, String firstName, String lastName, String username, String email,
-                 String phone, String hashPassword, List<String> associatedSiteIds){
+    public User (String id, LocalDateTime updatedAt, LocalDateTime createdAt, List<EntityTrail> entityTrail, String publisherId,
+                 SiteRole siteRole, String firstName, String lastName, String username, String email, String phone, String hashPassword){
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.entityTrail = entityTrail;
+        this.publisherId = publisherId;
         this.siteRole = siteRole;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -24,7 +47,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.hashPassword = hashPassword;
-        this.associatedSiteIds = associatedSiteIds;
+        // this.associatedSiteIds = associatedSiteIds;
     }
 
     public SiteRole getSiteRole() {
@@ -55,9 +78,6 @@ public class User {
         return hashPassword;
     }
 
-    public List<String> getAssociatedSiteIds() {
-        return associatedSiteIds;
-    }
 
     public void setSiteRole(SiteRole siteRole) {
         this.siteRole = siteRole;
@@ -87,41 +107,96 @@ public class User {
         this.hashPassword = hashPassword;
     }
 
-    public void setAssociatedSiteIds(List<String> associatedSiteIds) {
-        this.associatedSiteIds = associatedSiteIds;
+    @Override
+    public String getId() {
+        return id;
     }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @Override
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @Override
+    public List<EntityTrail> getEntityTrail() {
+        return entityTrail;
+    }
+
+    @Override
+    public String getPublisherId() {
+        return publisherId;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public void setEntityTrail(List<EntityTrail> entityTrail) {
+        this.entityTrail = entityTrail;
+    }
+
+    @Override
+    public void setPublisherId(String publisherId) {
+        this.publisherId = publisherId;
+    }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return getSiteRole() == user.getSiteRole() &&
-                Objects.equals(getFirstName(), user.getFirstName()) &&
-                Objects.equals(getLastName(), user.getLastName()) &&
-                Objects.equals(getUsername(), user.getUsername()) &&
-                Objects.equals(getEmail(), user.getEmail()) &&
-                Objects.equals(getPhone(), user.getPhone()) &&
-                Objects.equals(getHashPassword(), user.getHashPassword()) &&
-                Objects.equals(getAssociatedSiteIds(), user.getAssociatedSiteIds());
+        return getId().equals(user.getId()) &&
+                getUpdatedAt().equals(user.getUpdatedAt()) &&
+                getCreatedAt().equals(user.getCreatedAt()) &&
+                getEntityTrail().equals(user.getEntityTrail()) &&
+                getPublisherId().equals(user.getPublisherId()) &&
+                getSiteRole() == user.getSiteRole() &&
+                getFirstName().equals(user.getFirstName()) &&
+                getLastName().equals(user.getLastName()) &&
+                getUsername().equals(user.getUsername()) &&
+                getEmail().equals(user.getEmail()) &&
+                getPhone().equals(user.getPhone()) &&
+                getHashPassword().equals(user.getHashPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getHashPassword(), getAssociatedSiteIds());
+        return Objects.hash(getId(), getUpdatedAt(), getCreatedAt(), getEntityTrail(), getPublisherId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getHashPassword());
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "siteRole=" + siteRole +
+                "id='" + id + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", createdAt=" + createdAt +
+                ", entityTrail=" + entityTrail +
+                ", publisherId='" + publisherId + '\'' +
+                ", siteRole=" + siteRole +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", hashPassword='" + hashPassword + '\'' +
-                ", associatedSiteIds=" + associatedSiteIds +
                 '}';
     }
 }

@@ -130,7 +130,7 @@ public class SiteService {
 
         Site updatedSiteForPersistence = new Site(
                 existingSite.getId(),
-                currentTime,
+                existingSite.getCreatedAt(),
                 currentTime,
                 updatedTrail,
                 existingSite.getPublisherId(),

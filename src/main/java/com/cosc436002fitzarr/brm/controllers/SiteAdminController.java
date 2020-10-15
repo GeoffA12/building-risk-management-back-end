@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 public class SiteAdminController {
 
@@ -26,9 +24,4 @@ public class SiteAdminController {
         return siteAdminUserService.createSiteAdmin(requestBody);
     }
 
-    @PostMapping(value = "/authenticateUserLogin", consumes = "application/json", produces = "application/json")
-    public User authenticateUserLogin(@RequestBody User requestBody) {
-        LOGGER.info(requestBody.toString());
-        return siteAdminUserService.authenticateUserLogin(requestBody);
-    }
 }

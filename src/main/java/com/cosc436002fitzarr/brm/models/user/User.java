@@ -29,12 +29,14 @@ public class User implements Entity {
     private String email;
 
     private String phone;
+    private String authToken;
     private String hashPassword;
     // TODO: We'll worry about this after we finish base user setup and login/register stuff.
     // private List<String> associatedSiteIds;
 
     public User (String id, LocalDateTime updatedAt, LocalDateTime createdAt, List<EntityTrail> entityTrail, String publisherId,
-                 SiteRole siteRole, String firstName, String lastName, String username, String email, String phone, String hashPassword){
+                 SiteRole siteRole, String firstName, String lastName, String username, String email,
+                 String phone, String authToken, String hashPassword){
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -46,6 +48,7 @@ public class User implements Entity {
         this.username = username;
         this.email = email;
         this.phone = phone;
+        this.authToken = authToken;
         this.hashPassword = hashPassword;
         // this.associatedSiteIds = associatedSiteIds;
     }
@@ -72,6 +75,10 @@ public class User implements Entity {
 
     public String getPhone() {
         return phone;
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 
     public String getHashPassword() {
@@ -101,6 +108,10 @@ public class User implements Entity {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     public void setHashPassword(String hashPassword) {
@@ -174,12 +185,13 @@ public class User implements Entity {
                 getUsername().equals(user.getUsername()) &&
                 getEmail().equals(user.getEmail()) &&
                 getPhone().equals(user.getPhone()) &&
+                getAuthToken().equals(user.getAuthToken()) &&
                 getHashPassword().equals(user.getHashPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUpdatedAt(), getCreatedAt(), getEntityTrail(), getPublisherId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getHashPassword());
+        return Objects.hash(getId(), getUpdatedAt(), getCreatedAt(), getEntityTrail(), getPublisherId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getAuthToken(), getHashPassword());
     }
 
     @Override
@@ -196,6 +208,7 @@ public class User implements Entity {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
+                ", authToken='" + authToken + '\'' +
                 ", hashPassword='" + hashPassword + '\'' +
                 '}';
     }

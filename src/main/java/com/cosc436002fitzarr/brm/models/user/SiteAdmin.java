@@ -9,9 +9,9 @@ import java.util.List;
 public class SiteAdmin extends User implements Entity {
 
     public SiteAdmin(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail, String publisherId,
-                     SiteRole siteRole, String firstName, String lastName, String username, String email, String phone,
+                     SiteRole siteRole, String firstName, String lastName, String username, String email, String phone, String authToken,
                      String hashPassword) {
-        super(id, createdAt, updatedAt, entityTrail, publisherId, siteRole, firstName, lastName, username, email, phone, hashPassword);
+        super(id, createdAt, updatedAt, entityTrail, publisherId, siteRole, firstName, lastName, username, email, phone, authToken, hashPassword);
     }
 
 }

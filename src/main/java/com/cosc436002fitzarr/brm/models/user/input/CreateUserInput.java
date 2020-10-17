@@ -13,19 +13,19 @@ public class CreateUserInput {
     private String username;
     private String email;
     private String phone;
-    private String hashPassword;
+    private String password;
 
     @JsonCreator
     public CreateUserInput(@JsonProperty SiteRole siteRole, @JsonProperty String firstName, @JsonProperty String lastName,
                 @JsonProperty String username, @JsonProperty String email, @JsonProperty String phone,
-                @JsonProperty String hashPassword) {
+                @JsonProperty String password) {
         this.siteRole = siteRole;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.phone = phone;
-        this.hashPassword = hashPassword;
+        this.password = password;
     }
 
     public SiteRole getSiteRole() {
@@ -76,12 +76,12 @@ public class CreateUserInput {
         this.phone = phone;
     }
 
-    public String getHashPassword() {
-        return hashPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setHashPassword(String hashPassword) {
-        this.hashPassword = hashPassword;
+    public void setPassword(String hashPassword) {
+        this.password = hashPassword;
     }
 
     @Override
@@ -95,12 +95,12 @@ public class CreateUserInput {
                 getUsername().equals(that.getUsername()) &&
                 getEmail().equals(that.getEmail()) &&
                 getPhone().equals(that.getPhone()) &&
-                getHashPassword().equals(that.getHashPassword());
+                getPassword().equals(that.getPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getHashPassword());
+        return Objects.hash(getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getPassword());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CreateUserInput {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", hashPassword='" + hashPassword + '\'' +
+                ", hashPassword='" + password + '\'' +
                 '}';
     }
 }

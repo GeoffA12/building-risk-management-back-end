@@ -24,7 +24,7 @@ public class SiteAdminUserService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteService.class);
 
-    public User createSiteAdmin(CreateUserInput input) {
+    public User createSiteAdmin(CreateUserInput input, String authToken) {
         String id = UUID.randomUUID().toString();
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
@@ -42,7 +42,8 @@ public class SiteAdminUserService {
                 input.getUsername(),
                 input.getEmail(),
                 input.getPhone(),
-                input.getHashPassword()
+                authToken,
+                input.getPassword()
         );
 
         userRepository.save(siteAdminForPersistence);

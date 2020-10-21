@@ -19,7 +19,6 @@ public class UserController {
 
     @PostMapping(value = "/authenticateUserLogin", consumes = "application/json", produces = "application/json")
     public User authenticateUserLogin(@RequestBody User requestBody) {
-        LOGGER.info(requestBody.toString());
         return userService.authenticateUserLogin(requestBody);
     }
 

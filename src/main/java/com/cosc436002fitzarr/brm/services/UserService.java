@@ -19,6 +19,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -104,6 +105,10 @@ public class UserService {
             throw new RuntimeException(e);
         }
         return deletedUser;
+    }
+
+    public List<User> getUsersBySiteRole(String siteRole){
+        return userRepository.findBySiteRole(siteRole);
     }
 
     public User authenticateUserLogin(User requestBody) {

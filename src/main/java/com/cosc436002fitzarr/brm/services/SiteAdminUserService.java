@@ -25,7 +25,7 @@ public class SiteAdminUserService {
     @Autowired
     public UserRepository userRepository;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(SiteService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SiteAdminUserService.class);
 
     public User createSiteAdmin(CreateUserInput input, String authToken) {
         String id = UUID.randomUUID().toString();
@@ -61,7 +61,7 @@ public class SiteAdminUserService {
     public User updateSiteAdmin(UpdateUserInput input) {
         User existingSiteAdmin;
         try {
-            existingSiteAdmin = userRepository.findByUsername(input.getUsername());
+            existingSiteAdmin = userRepository.getById(input.getId());
             LOGGER.info("Successfully retrieved site admin user: " + existingSiteAdmin.toString() + " out of repository to update.");
         } catch (Exception e) {
             LOGGER.info(e.toString());
@@ -77,7 +77,7 @@ public class SiteAdminUserService {
 
         updatedTrail.add(updateTrail);
 
-        User updatedSiteAdminForPersistence = new User(
+        User updatedSiteAdminForPersistence = new SiteAdmin(
                 existingSiteAdmin.getId(),
                 currentTime,
                 existingSiteAdmin.getCreatedAt(),
@@ -86,15 +86,16 @@ public class SiteAdminUserService {
                 input.getSiteRole(),
                 input.getFirstName(),
                 input.getLastName(),
-                existingSiteAdmin.getUsername(),
+                input.getUsername(),
                 input.getEmail(),
                 input.getPhone(),
+                input.getAuthToken(),
                 input.getHashPassword()
         );
 
         try {
             userRepository.save(updatedSiteAdminForPersistence);
-            LOGGER.info("User " + updatedSiteAdminForPersistence.toString() + " saved in site repository");
+            LOGGER.info("User " + updatedSiteAdminForPersistence.toString() + " saved in user repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);

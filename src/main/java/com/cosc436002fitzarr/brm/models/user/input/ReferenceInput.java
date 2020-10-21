@@ -25,7 +25,7 @@ public class ReferenceInput {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        com.cosc436002fitzarr.brm.models.user.input.ReferenceInput that = (com.cosc436002fitzarr.brm.models.user.input.ReferenceInput) o;
+        ReferenceInput that = (ReferenceInput) o;
         return id.equals(that.id);
     }
 

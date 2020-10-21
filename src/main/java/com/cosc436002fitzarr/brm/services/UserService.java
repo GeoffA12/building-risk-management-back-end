@@ -1,7 +1,10 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.models.site.Site;
+import com.cosc436002fitzarr.brm.models.site.input.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
+import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +30,7 @@ public class UserService {
     public SiteAdminUserService siteAdminUserService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
@@ -72,6 +77,38 @@ public class UserService {
                 newUser = null;
         }
         return newUser;
+    }
+
+    // For each user subclass we create, each user type will have their own 'update API'. This API will just route the
+    // input to the correct user service.
+    public User updateUser(UpdateUserInput input) {
+        User existingUser;
+        switch(input.getSiteRole()) {
+            case SITEADMIN:
+                existingUser = siteAdminUserService.updateSiteAdmin(input);
+                break;
+            // TODO: Create additional case statements once new user services are implemented and added to the repository
+            default:
+                existingUser = null;
+        }
+        return existingUser;
+    }
+
+    public User deleteUser(ReferenceInput requestBody) {
+        String existingUserId = requestBody.getId();
+        User deletedUser;
+        try {
+            deletedUser = userRepository.getById(existingUserId);
+            userRepository.deleteById(existingUserId);
+        } catch (Exception e) {
+            LOGGER.info("User with id: " + existingUserId + " not found in repository");
+            throw new RuntimeException(e);
+        }
+        return deletedUser;
+    }
+
+    public List<User> getUsersBySiteRole(String siteRole){
+        return userRepository.findBySiteRole(siteRole);
     }
 
     public User authenticateUserLogin(User requestBody) {

@@ -14,11 +14,12 @@ public class CreateUserInput {
     private String email;
     private String phone;
     private String password;
+    private String siteId;
 
     @JsonCreator
     public CreateUserInput(@JsonProperty SiteRole siteRole, @JsonProperty String firstName, @JsonProperty String lastName,
-                @JsonProperty String username, @JsonProperty String email, @JsonProperty String phone,
-                @JsonProperty String password) {
+                           @JsonProperty String username, @JsonProperty String email, @JsonProperty String phone,
+                           @JsonProperty String password, @JsonProperty String siteId) {
         this.siteRole = siteRole;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -26,6 +27,7 @@ public class CreateUserInput {
         this.email = email;
         this.phone = phone;
         this.password = password;
+        this.siteId = siteId;
     }
 
     public SiteRole getSiteRole() {
@@ -84,6 +86,14 @@ public class CreateUserInput {
         this.password = hashPassword;
     }
 
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -95,12 +105,13 @@ public class CreateUserInput {
                 getUsername().equals(that.getUsername()) &&
                 getEmail().equals(that.getEmail()) &&
                 getPhone().equals(that.getPhone()) &&
-                getPassword().equals(that.getPassword());
+                getPassword().equals(that.getPassword()) &&
+                getSiteId().equals(that.getSiteId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getPassword());
+        return Objects.hash(getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(), getPhone(), getPassword(), getSiteId());
     }
 
     @Override
@@ -112,7 +123,8 @@ public class CreateUserInput {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", hashPassword='" + password + '\'' +
+                ", password='" + password + '\'' +
+                ", siteId='" + siteId + '\'' +
                 '}';
     }
 }

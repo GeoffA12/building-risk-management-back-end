@@ -1,12 +1,15 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.models.PageInput;
+import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
+import com.cosc436002fitzarr.brm.utils.PageUtils;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKeyFactory;
@@ -15,8 +18,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -24,6 +27,8 @@ public class UserService {
     public UserRepository userRepository;
     @Autowired
     public SiteAdminUserService siteAdminUserService;
+    @Autowired
+    public SiteService siteService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
@@ -71,6 +76,8 @@ public class UserService {
             default:
                 newUser = null;
         }
+
+        siteService.attachUserIdToUserIdList(input.getSiteId(), newUser.getId());
         return newUser;
     }
 
@@ -79,7 +86,6 @@ public class UserService {
         // the example matcher will use an AND operator between the two attributes by default, which is the functionality we want here.
         String hashedPassword = createHashedPassword(requestBody.getHashPassword());
         requestBody.setHashPassword(hashedPassword);
-
         Example<User> user = Example.of(requestBody);
         // This line will look in the userRepository for the 'user' example matcher defined above. I.E. we're telling Mongo to query all user records
         // where { userName: "John", hashPassword: "123Haha" }
@@ -93,5 +99,25 @@ public class UserService {
             userProfile = null;
         }
         return userProfile;
+    }
+
+    // 2) We already have a built in .findAllById(List<String> ids) method. Use this in other APIs.
+    public Map<String, Object> getAllUsersBySite(PageInput input, List<String> siteIds) {
+
+        Sort sortProperty = Sort.by(input.getSortDirection(), input.getSortBy());
+        Pageable page = PageRequest.of(input.getPageNo().intValue(), input.getPageSize().intValue(), sortProperty);
+
+        Page<User> userPages = userRepository.findAll(page);
+        List<User> userPageContent = userPages.getContent();
+        Collections.disjoint(siteIds, new ArrayList<String>());
+        // TODO: Optimize this code, I think this is running in O(n^2) time complexity. Collections.disjoint will compare the Site Id List of the user
+        // and the site ID list of the user stored in the repository. If any of the site ID's are contained in both the input user list and the repository user list,
+        // then we have a match, and will return this user in the page
+        List<User> filteredUsersBySite = userPageContent.stream()
+                .filter(user -> !Collections.disjoint(user.getAssociatedSiteIds(), siteIds))
+                .collect(Collectors.toList());
+
+        Map<String, Object> userResponseMap = PageUtils.getUserMappingResponse(userPages, filteredUsersBySite);
+        return userResponseMap;
     }
 }

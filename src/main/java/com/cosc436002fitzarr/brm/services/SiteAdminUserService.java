@@ -29,27 +29,32 @@ public class SiteAdminUserService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
         List<EntityTrail> entityTrail = new ArrayList<>();
+        List<String> associatedSiteIds = new ArrayList<>();
+        associatedSiteIds.add(input.getSiteId());
         entityTrail.add(new EntityTrail(currentTime, id, getCreatedSiteAdminMessage()));
         User siteAdminForPersistence = new SiteAdmin(
-                id,
-                currentTime,
-                currentTime,
-                entityTrail,
-                id,
-                input.getSiteRole(),
-                input.getFirstName(),
-                input.getLastName(),
-                input.getUsername(),
-                input.getEmail(),
-                input.getPhone(),
-                authToken,
-                input.getPassword()
+            id,
+            currentTime,
+            currentTime,
+            entityTrail,
+            id,
+            input.getSiteRole(),
+            input.getFirstName(),
+            input.getLastName(),
+            input.getUsername(),
+            input.getEmail(),
+            input.getPhone(),
+            authToken,
+            input.getPassword(),
+            associatedSiteIds
         );
 
         userRepository.save(siteAdminForPersistence);
         LOGGER.info("Persisted new site admin: " + siteAdminForPersistence.toString() + " to the user repository");
         return siteAdminForPersistence;
     }
+
+
 
     public String getCreatedSiteAdminMessage() {
         return "CREATED SITE ADMIN USER";

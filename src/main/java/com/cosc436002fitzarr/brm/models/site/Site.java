@@ -18,13 +18,10 @@ public class Site implements Entity {
     private String siteName;
     private String siteCode;
     private Address address;
-    // Whenever an admin creates a new site, we'll initially add the publisherId to the site first. Every subsequent user in the system will be added to this list
-    // when they register an account at a new site or an admin grants them permission to the site.
-    // TODO: Integrate with User class. (Given a list of ID's for the users at a site, we should be able to call the User service and request a list of users back.)
-    // private List<String> userIds;
+    private List<String> userIds;
 
     public Site(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail,
-                String publisherId, String siteName, String siteCode, Address address) {
+                String publisherId, String siteName, String siteCode, Address address, List<String> userIds) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -33,6 +30,7 @@ public class Site implements Entity {
         this.siteName = siteName;
         this.siteCode = siteCode;
         this.address = address;
+        this.userIds = userIds;
     }
 
     @Override
@@ -72,6 +70,10 @@ public class Site implements Entity {
         return address;
     }
 
+    public List<String> getUserIds() {
+        return userIds;
+    }
+
     @Override
     public void setId(String id) {
         this.id = id;
@@ -109,6 +111,10 @@ public class Site implements Entity {
         this.address = address;
     }
 
+    public void setUserIds(List<String> userIds) {
+        this.userIds = userIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,12 +127,13 @@ public class Site implements Entity {
                 getPublisherId().equals(site.getPublisherId()) &&
                 getSiteName().equals(site.getSiteName()) &&
                 getSiteCode().equals(site.getSiteCode()) &&
-                getAddress().equals(site.getAddress());
+                getAddress().equals(site.getAddress()) &&
+                getUserIds().equals(site.getUserIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getSiteName(), getSiteCode(), getAddress());
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getSiteName(), getSiteCode(), getAddress(), getUserIds());
     }
 
     @Override
@@ -140,6 +147,7 @@ public class Site implements Entity {
                 ", siteName='" + siteName + '\'' +
                 ", siteCode='" + siteCode + '\'' +
                 ", address=" + address +
+                ", userIds=" + userIds +
                 '}';
     }
 }

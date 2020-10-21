@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.models.site.input;
 
+import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Address;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

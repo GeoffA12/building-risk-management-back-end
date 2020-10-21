@@ -1,9 +1,11 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.*;
 import com.cosc436002fitzarr.brm.repositories.SiteRepository;
+import org.bson.codecs.IterableCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +15,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class SiteService {
@@ -32,6 +36,7 @@ public class SiteService {
         String id = UUID.randomUUID().toString();
 
         List<EntityTrail> entityList = new ArrayList<>();
+        List<String> userIds = new ArrayList<>();
         entityList.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedSiteSystemComment()));
         Site siteForPersistence = new Site(
             id,
@@ -41,10 +46,10 @@ public class SiteService {
             input.getPublisherId(),
             input.getSiteName(),
             input.getSiteCode(),
-            input.getAddress()
+            input.getAddress(),
+            userIds
         );
         Site persistedSite;
-        LOGGER.info(siteForPersistence.toString());
         try {
             persistedSite = siteRepository.save(siteForPersistence);
             LOGGER.info("Site: " + persistedSite.toString() + " saved in site repository");
@@ -101,15 +106,45 @@ public class SiteService {
                 .stream()
                 .map(ReferenceInput::getId)
                 .collect(Collectors.toList());
-        LOGGER.info(test.toString());
         List<String> ids = new ArrayList<>();
         for (ReferenceInput reference : input.getSiteIds()) {
             ids.add(reference.getId());
         }
-        return siteRepository.findSitesById(ids);
+        Iterable<Site> siteIterator = siteRepository.findAllById(ids);
+        List<Site> siteList = StreamSupport
+                .stream(siteIterator.spliterator(), false)
+                .collect(Collectors.toList());
+        return siteList;
     }
 
     public Site updateSite(UpdateSiteInput input) {
+        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+
+        Site updatedSite = getUpdatedSite(input);
+
+        Site updatedSiteForPersistence = new Site(
+            updatedSite.getId(),
+            updatedSite.getCreatedAt(),
+            currentTime,
+            updatedSite.getEntityTrail(),
+            updatedSite.getPublisherId(),
+            input.getSiteName(),
+            input.getSiteCode(),
+            input.getAddress(),
+            updatedSite.getUserIds()
+        );
+
+        try {
+            siteRepository.save(updatedSiteForPersistence);
+            LOGGER.info("Site " + updatedSiteForPersistence.toString() + " saved in site repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+        return updatedSiteForPersistence;
+    }
+
+    public Site getUpdatedSite(UpdateSiteInput input) {
         Site existingSite;
         try {
             existingSite = siteRepository.getById(input.getReferenceInput().getId());
@@ -128,25 +163,9 @@ public class SiteService {
 
         updatedTrail.add(updateTrail);
 
-        Site updatedSiteForPersistence = new Site(
-                existingSite.getId(),
-                existingSite.getCreatedAt(),
-                currentTime,
-                updatedTrail,
-                existingSite.getPublisherId(),
-                input.getSiteName(),
-                input.getSiteCode(),
-                existingSite.getAddress()
-        );
+        existingSite.setEntityTrail(updatedTrail);
 
-        try {
-            siteRepository.save(updatedSiteForPersistence);
-            LOGGER.info("Site " + updatedSiteForPersistence.toString() + " saved in site repository");
-        } catch (Exception e) {
-            LOGGER.info(e.toString());
-            throw new RuntimeException(e);
-        }
-        return updatedSiteForPersistence;
+        return existingSite;
     }
 
     public Site deleteSite(ReferenceInput requestBody) {
@@ -160,6 +179,35 @@ public class SiteService {
             throw new RuntimeException(e);
         }
         return deletedSite;
+    }
+
+    public void attachUserIdToUserIdList(String existingSiteId, String userId) {
+        UpdateSiteInput updateSiteInput = new UpdateSiteInput(userId, new ReferenceInput(existingSiteId), null, null, null);
+        Site updatedSite = getUpdatedSite(updateSiteInput);
+        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+        List<String> existingUserIdList = updatedSite.getUserIds();
+        List<String> newUserIdList = new ArrayList<>(existingUserIdList);
+        newUserIdList.add(userId);
+
+        Site updatedSiteForPersistence = new Site(
+            updatedSite.getId(),
+            updatedSite.getCreatedAt(),
+            currentTime,
+            updatedSite.getEntityTrail(),
+            updatedSite.getPublisherId(),
+            updatedSite.getSiteName(),
+            updatedSite.getSiteCode(),
+            updatedSite.getAddress(),
+            newUserIdList
+        );
+
+        try {
+            siteRepository.save(updatedSiteForPersistence);
+            LOGGER.info("Site " + updatedSiteForPersistence.toString() + " saved in site repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
     }
 
     public String getCreatedSiteSystemComment() {

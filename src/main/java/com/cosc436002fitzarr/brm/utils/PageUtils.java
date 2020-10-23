@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public class PageUtils {
-    private static final String dataKey = "Data";
-    private static final String totalPagesKey = "Total number of pages";
-    private static final String totalElementsKey = "Total number of elements";
-    private static final String currentPageNumberKey = "Current page number";
+    private static final String dataKey = "users";
+    private static final String totalPagesKey = "totalPages";
+    private static final String totalElementsKey = "totalElements";
+    private static final String currentPageNumberKey = "currentPage";
 
     public static Map<String, Object> getUserMappingResponse(Page<User> objectPages, List<User> filteredUserContent) {
         Map<String, Object> responseMap = new HashMap<>();

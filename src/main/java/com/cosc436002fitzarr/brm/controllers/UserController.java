@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.controllers;
 
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 
@@ -55,7 +56,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getUsersBySiteRole", produces = "application/json")
-    public List<User> getUsersBySiteRole(@RequestParam(name = "siteRole") String siteRole) {
+    public List<User> getUsersBySiteRole(@RequestParam(name = "siteRole") SiteRole siteRole) {
         return userService.getUsersBySiteRole(siteRole);
     }
 }

@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.PageInput;
 import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.user.User;
@@ -117,7 +118,7 @@ public class UserService {
         return deletedUser;
     }
 
-    public List<User> getUsersBySiteRole(String siteRole){
+    public List<User> getUsersBySiteRole(SiteRole siteRole){
         return userRepository.findBySiteRole(siteRole);
     }
 
@@ -149,7 +150,6 @@ public class UserService {
 
         Page<User> userPages = userRepository.findAll(page);
         List<User> userPageContent = userPages.getContent();
-        Collections.disjoint(siteIds, new ArrayList<String>());
         // TODO: Optimize this code, I think this is running in O(n^2) time complexity. Collections.disjoint will compare the Site Id List of the user
         // and the site ID list of the user stored in the repository. If any of the site ID's are contained in both the input user list and the repository user list,
         // then we have a match, and will return this user in the page

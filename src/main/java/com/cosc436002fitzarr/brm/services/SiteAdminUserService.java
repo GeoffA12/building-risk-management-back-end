@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.UpdateSiteInput;
@@ -8,6 +9,7 @@ import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
+import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +59,6 @@ public class SiteAdminUserService {
         return siteAdminForPersistence;
     }
 
-
-
     public String getCreatedSiteAdminMessage() {
         return "CREATED SITE ADMIN USER";
     }
@@ -95,7 +95,8 @@ public class SiteAdminUserService {
                 input.getEmail(),
                 input.getPhone(),
                 input.getAuthToken(),
-                input.getHashPassword()
+                input.getHashPassword(),
+                existingSiteAdmin.getAssociatedSiteIds()
         );
 
         try {
@@ -112,7 +113,7 @@ public class SiteAdminUserService {
         return "UPDATED SITE ADMIN USER";
     }
 
-    public List<User> getAllSiteAdmins(String siteRole){
+    public List<User> getAllSiteAdmins(SiteRole siteRole) {
         return userRepository.findBySiteRole(siteRole);
     }
 

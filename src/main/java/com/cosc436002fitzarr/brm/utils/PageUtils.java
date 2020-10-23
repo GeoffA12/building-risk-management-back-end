@@ -17,7 +17,7 @@ public class PageUtils {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put(dataKey, filteredUserContent);
         responseMap.put(totalPagesKey, objectPages.getTotalPages());
-        responseMap.put(totalElementsKey, objectPages.getTotalElements());
+        responseMap.put(totalElementsKey, filteredUserContent.size());
         responseMap.put(currentPageNumberKey, objectPages.getNumber());
         return responseMap;
     }

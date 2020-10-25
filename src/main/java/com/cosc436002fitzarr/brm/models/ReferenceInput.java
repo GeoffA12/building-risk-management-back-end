@@ -1,4 +1,4 @@
-package com.cosc436002fitzarr.brm.models.site.input;
+package com.cosc436002fitzarr.brm.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

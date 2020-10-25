@@ -1,16 +1,23 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.site.input.ReferenceInput;
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
+
+import com.cosc436002fitzarr.brm.models.user.input.GetAllUsersBySiteInput;
+
+import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
+
 import com.cosc436002fitzarr.brm.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.List;
+
 
 @RestController
 public class UserController {
@@ -30,6 +37,12 @@ public class UserController {
         return userService.createUser(requestBody);
     }
 
+    @PostMapping("/getAllUsersBySite")
+    public Map<String, Object> getAllUsersBySite(@RequestBody GetAllUsersBySiteInput input) {
+        LOGGER.info(input.toString());
+        return userService.getAllUsersBySite(input.getPageInput(), input.getSiteIds());
+    }
+
     @PutMapping(value = "/updateUser", consumes = "application/json", produces = "application/json")
     public User updateUser(@RequestBody UpdateUserInput requestBody) {
         LOGGER.info(requestBody.toString());
@@ -43,8 +56,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getUsersBySiteRole", produces = "application/json")
-    public List<User> getUsersBySiteRole(@RequestParam(name = "siteRole") String siteRole) {
+    public List<User> getUsersBySiteRole(@RequestParam(name = "siteRole") SiteRole siteRole) {
         return userService.getUsersBySiteRole(siteRole);
     }
-
 }

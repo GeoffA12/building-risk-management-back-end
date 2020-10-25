@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.controllers;
 
+import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.input.*;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.services.SiteService;

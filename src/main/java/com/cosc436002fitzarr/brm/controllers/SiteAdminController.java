@@ -1,6 +1,7 @@
 package com.cosc436002fitzarr.brm.controllers;
 
 
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -32,7 +33,7 @@ public class SiteAdminController {
     }
 
     @GetMapping(value = "/getAllSiteAdmins", produces = "application/json")
-    public List<User> getAllSiteAdmins(@RequestParam(name = "siteRole") String siteRole) {
+    public List<User> getAllSiteAdmins(@RequestParam(name = "siteRole") SiteRole siteRole) {
         return siteAdminUserService.getAllSiteAdmins(siteRole);
     }
 

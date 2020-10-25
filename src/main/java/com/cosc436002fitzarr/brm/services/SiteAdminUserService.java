@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.UpdateSiteInput;
@@ -8,6 +9,7 @@ import com.cosc436002fitzarr.brm.models.user.User;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
+import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +34,24 @@ public class SiteAdminUserService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
         List<EntityTrail> entityTrail = new ArrayList<>();
+        List<String> associatedSiteIds = new ArrayList<>();
+        associatedSiteIds.add(input.getSiteId());
         entityTrail.add(new EntityTrail(currentTime, id, getCreatedSiteAdminMessage()));
         User siteAdminForPersistence = new SiteAdmin(
-                id,
-                currentTime,
-                currentTime,
-                entityTrail,
-                id,
-                input.getSiteRole(),
-                input.getFirstName(),
-                input.getLastName(),
-                input.getUsername(),
-                input.getEmail(),
-                input.getPhone(),
-                authToken,
-                input.getPassword()
+            id,
+            currentTime,
+            currentTime,
+            entityTrail,
+            id,
+            input.getSiteRole(),
+            input.getFirstName(),
+            input.getLastName(),
+            input.getUsername(),
+            input.getEmail(),
+            input.getPhone(),
+            authToken,
+            input.getPassword(),
+            associatedSiteIds
         );
 
         userRepository.save(siteAdminForPersistence);
@@ -90,7 +95,8 @@ public class SiteAdminUserService {
                 input.getEmail(),
                 input.getPhone(),
                 input.getAuthToken(),
-                input.getHashPassword()
+                input.getHashPassword(),
+                existingSiteAdmin.getAssociatedSiteIds()
         );
 
         try {
@@ -107,7 +113,7 @@ public class SiteAdminUserService {
         return "UPDATED SITE ADMIN USER";
     }
 
-    public List<User> getAllSiteAdmins(String siteRole){
+    public List<User> getAllSiteAdmins(SiteRole siteRole) {
         return userRepository.findBySiteRole(siteRole);
     }
 

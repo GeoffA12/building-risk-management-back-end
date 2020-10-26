@@ -59,4 +59,9 @@ public class UserController {
     public List<User> getUsersBySiteRole(@RequestParam(name = "siteRole") SiteRole siteRole) {
         return userService.getUsersBySiteRole(siteRole);
     }
+
+    @GetMapping(value = "/getUserById")
+    public User getUserById(@RequestParam(name = "id") String id) {
+        return userService.getUserById(id);
+    }
 }

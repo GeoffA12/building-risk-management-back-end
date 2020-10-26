@@ -160,4 +160,16 @@ public class UserService {
         Map<String, Object> userResponseMap = PageUtils.getUserMappingResponse(userPages, filteredUsersBySite);
         return userResponseMap;
     }
+
+    public User getUserById(String id) {
+        Optional<User> user;
+        try {
+            user = userRepository.findById(id);
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException();
+        }
+
+        return user.isPresent() ? user.get() : null;
+    }
 }

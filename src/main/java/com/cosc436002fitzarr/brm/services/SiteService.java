@@ -5,7 +5,6 @@ import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.*;
 import com.cosc436002fitzarr.brm.repositories.SiteRepository;
-import org.bson.codecs.IterableCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+// TODO: Implement a '/removeUserIdFromUserIdList' that will be called when a user is deleted.
 @Service
 public class SiteService {
 

@@ -1,19 +1,15 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-
-import com.cosc436002fitzarr.brm.enums.SiteRole;
-import com.cosc436002fitzarr.brm.models.user.User;
+import com.cosc436002fitzarr.brm.models.user.SiteAdmin;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 
-import com.cosc436002fitzarr.brm.services.SiteAdminUserService;
+import com.cosc436002fitzarr.brm.services.SiteAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,20 +18,34 @@ import org.springframework.web.bind.annotation.RestController;
 public class SiteAdminController {
 
     @Autowired
-    private SiteAdminUserService siteAdminUserService;
+    private SiteAdminService siteAdminService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteController.class);
 
-    @PutMapping(value = "/updateSiteAdminUser", consumes = "application/json", produces = "application/json")
-    public User updateSiteAdmin(@RequestBody UpdateUserInput requestBody) {
+    @PostMapping(value = "/updateSiteAdmin", consumes = "application/json", produces = "application/json")
+    public SiteAdmin updateSiteAdmin(@RequestBody UpdateUserInput requestBody) {
         LOGGER.info(requestBody.toString());
-        return siteAdminUserService.updateSiteAdmin(requestBody);
+        return siteAdminService.updateSiteAdmin(requestBody);
     }
 
-    @GetMapping(value = "/getAllSiteAdmins", produces = "application/json")
-    public List<User> getAllSiteAdmins(@RequestParam(name = "siteRole") SiteRole siteRole) {
-        return siteAdminUserService.getAllSiteAdmins(siteRole);
+    @PostMapping(value = "/createSiteAdmin", consumes = "application/json", produces = "application/json")
+    public SiteAdmin createSiteAdmin(@RequestBody CreateUserInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return siteAdminService.createSiteAdmin(requestBody);
     }
 
+    @GetMapping(value = "/getSiteAdminById")
+    public SiteAdmin getSiteAdminById(@RequestParam(name="id") String id) {
+        return siteAdminService.getById(id);
+    }
 
+    @DeleteMapping(value = "/deleteSiteAdmin")
+    public String deleteSiteAdmin(@RequestParam(name="id") String id) {
+        SiteAdmin deletedSiteAdmin = siteAdminService.deleteSiteAdmin(id);
+        if (deletedSiteAdmin == null) {
+            return "Site admin with ID: " + id + " not found in site admin repository";
+        } else {
+            return "Deleted: " + deletedSiteAdmin.toString();
+        }
+    }
 }

@@ -15,12 +15,11 @@ public class UpdateUserInput {
     private String email;
     private String phone;
     private String authToken;
-    private String hashPassword;
 
     @JsonCreator
     public UpdateUserInput(@JsonProperty String id, @JsonProperty SiteRole siteRole, @JsonProperty String firstName,
                            @JsonProperty String lastName, @JsonProperty String username, @JsonProperty String email,
-                           @JsonProperty String phone, @JsonProperty String authToken, @JsonProperty String hashPassword) {
+                           @JsonProperty String phone, @JsonProperty String authToken) {
         this.id = id;
         this.siteRole = siteRole;
         this.firstName = firstName;
@@ -29,7 +28,6 @@ public class UpdateUserInput {
         this.email = email;
         this.phone = phone;
         this.authToken = authToken;
-        this.hashPassword = hashPassword;
     }
 
     public String getId() {
@@ -96,14 +94,6 @@ public class UpdateUserInput {
         this.authToken = authToken;
     }
 
-    public String getHashPassword() {
-        return hashPassword;
-    }
-
-    public void setHashPassword(String hashPassword) {
-        this.hashPassword = hashPassword;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,14 +106,13 @@ public class UpdateUserInput {
                 getUsername().equals(that.getUsername()) &&
                 getEmail().equals(that.getEmail()) &&
                 getPhone().equals(that.getPhone()) &&
-                getAuthToken().equals(that.getAuthToken()) &&
-                getHashPassword().equals(that.getHashPassword());
+                getAuthToken().equals(that.getAuthToken());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(),
-                getPhone(), getAuthToken(), getHashPassword());
+                getPhone(), getAuthToken());
     }
 
     @Override
@@ -137,7 +126,6 @@ public class UpdateUserInput {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", authToken='" + authToken + '\'' +
-                ", hashPassword='" + hashPassword + '\'' +
                 '}';
     }
 }

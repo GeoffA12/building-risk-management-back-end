@@ -4,7 +4,6 @@ import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.PageInput;
 import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.user.User;
-import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.utils.PageUtils;
 
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -34,7 +33,7 @@ public class UserService {
     @Autowired
     public UserRepository userRepository;
     @Autowired
-    public SiteAdminUserService siteAdminUserService;
+    public SiteAdminService siteAdminService;
     @Autowired
     public SiteService siteService;
 
@@ -67,55 +66,6 @@ public class UserService {
             LOGGER.info(ikse.toString());
         }
         return new String(hash);
-    }
-
-    // For each user subclass we create, each user type will have their own 'create API'. This API will just route the
-    // input to the correct user service.
-    public User createUser(CreateUserInput input) {
-        User newUser;
-
-        String hashedPassword = createHashedPassword(input.getPassword());
-        input.setPassword(hashedPassword);
-        String authToken = generateNewUserToken();
-        switch(input.getSiteRole()) {
-            case SITEADMIN:
-                newUser = siteAdminUserService.createSiteAdmin(input, authToken);
-                break;
-            // TODO: Create additional case statements once new user services are implemented and added to the repository
-            default:
-                newUser = null;
-        }
-
-        siteService.attachUserIdToUserIdList(input.getSiteId(), newUser.getId());
-        return newUser;
-    }
-
-    // For each user subclass we create, each user type will have their own 'update API'. This API will just route the
-    // input to the correct user service.
-    public User updateUser(UpdateUserInput input) {
-        User existingUser;
-        switch(input.getSiteRole()) {
-            case SITEADMIN:
-                existingUser = siteAdminUserService.updateSiteAdmin(input);
-                break;
-            // TODO: Create additional case statements once new user services are implemented and added to the repository
-            default:
-                existingUser = null;
-        }
-        return existingUser;
-    }
-
-    public User deleteUser(ReferenceInput requestBody) {
-        String existingUserId = requestBody.getId();
-        User deletedUser;
-        try {
-            deletedUser = userRepository.getById(existingUserId);
-            userRepository.deleteById(existingUserId);
-        } catch (Exception e) {
-            LOGGER.info("User with id: " + existingUserId + " not found in repository");
-            throw new RuntimeException(e);
-        }
-        return deletedUser;
     }
 
     public List<User> getUsersBySiteRole(SiteRole siteRole){

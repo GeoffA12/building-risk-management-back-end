@@ -134,7 +134,7 @@ public class WorkplaceHealthSafetyMemberService {
                     "safety repository");
             userRepository.save(updatedWorkplaceHealthSafetyMemberForPersistence);
             LOGGER.info("Workplace health and safety member: " + updatedWorkplaceHealthSafetyMemberForPersistence.getUpdatedAt().toString() + " saved in " +
-                    "workplace health and safety repository");
+                    "user repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);

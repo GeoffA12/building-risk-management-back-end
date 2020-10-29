@@ -117,6 +117,7 @@ public class SiteMaintenanceAssociateService {
 
         updatedTrail.add(updateTrail);
 
+        // TODO: If the user updates the site role of the employee, then we will end up storing WHS Members and Site Maintenance Managers in the SiteMaintenanceAssociate repository.
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
             existingSiteMaintenanceAssociate.getId(),
             currentTime,
@@ -140,7 +141,7 @@ public class SiteMaintenanceAssociateService {
             siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociateForPersistence);
             LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociateForPersistence.toString() + " saved in site maintenance associate repository");
             userRepository.save(updatedSiteMaintenanceAssociateForPersistence);
-            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociateForPersistence.toString() + " saved in site maintenance associate repository");
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociateForPersistence.toString() + " saved in user repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);

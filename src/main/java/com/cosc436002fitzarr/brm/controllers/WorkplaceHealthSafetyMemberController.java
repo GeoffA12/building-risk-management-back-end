@@ -36,11 +36,7 @@ public class WorkplaceHealthSafetyMemberController {
     @DeleteMapping(value = "/deleteWorkplaceHealthSafetyMember")
     public String deleteWorkplaceHealthSafetyMember(@RequestParam(name = "id") String id) {
         WorkplaceHealthSafetyMember deletedWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberService.deleteWorkplaceHealthSafetyMember(id);
-        if (deletedWorkplaceHealthSafetyMember == null) {
-            return "Workplace health safety member with id: " + id + " not found in the workplace health and safety repository";
-        } else {
-            return "Workplace health safety member: " + deletedWorkplaceHealthSafetyMember.toString() + " successfully deleted " +
+        return "Workplace health safety member: " + deletedWorkplaceHealthSafetyMember.toString() + " successfully deleted " +
                     "from workplace health and safety and user repositories";
-        }
     }
 }

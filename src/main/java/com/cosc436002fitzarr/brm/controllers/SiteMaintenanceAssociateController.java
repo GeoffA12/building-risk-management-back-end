@@ -36,12 +36,6 @@ public class SiteMaintenanceAssociateController {
     @DeleteMapping(value = "/deleteSiteMaintenanceAssociate")
     public String deleteSiteMaintenanceAssociate(@RequestParam(name = "id") String id) {
         SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(id);
-
-        if (deletedSiteMaintenanceAssociate == null) {
-            return "Site Maintenance Associate with id: " + id + " not found in site maintenance associate repository";
-        } else {
-            return "Deleted: " + deletedSiteMaintenanceAssociate.toString() + " from site maintenance associate repository";
-        }
+        return "Deleted: " + deletedSiteMaintenanceAssociate.toString() + " from site maintenance associate repository";
     }
-
 }

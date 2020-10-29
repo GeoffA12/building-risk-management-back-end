@@ -53,6 +53,7 @@ public class SiteMaintenanceAssociate extends User implements Entity {
         return Objects.hash(super.hashCode(), getSiteMaintenanceManagerId(), getAssignedBuildingRiskAssessmentIds());
     }
 
+    // TODO: Use super.toString() and append this to the toString() in all user subclasses.
     @Override
     public String toString() {
         return "SiteMaintenanceAssociate{" +

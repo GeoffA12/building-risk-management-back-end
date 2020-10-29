@@ -20,7 +20,7 @@ public class SiteAdminController {
     @Autowired
     private SiteAdminService siteAdminService;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(SiteController.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SiteAdminController.class);
 
     @PostMapping(value = "/updateSiteAdmin", consumes = "application/json", produces = "application/json")
     public SiteAdmin updateSiteAdmin(@RequestBody UpdateUserInput requestBody) {
@@ -42,10 +42,6 @@ public class SiteAdminController {
     @DeleteMapping(value = "/deleteSiteAdmin")
     public String deleteSiteAdmin(@RequestParam(name="id") String id) {
         SiteAdmin deletedSiteAdmin = siteAdminService.deleteSiteAdmin(id);
-        if (deletedSiteAdmin == null) {
-            return "Site admin with ID: " + id + " not found in site admin repository";
-        } else {
-            return "Deleted: " + deletedSiteAdmin.toString();
-        }
+        return "Deleted: " + deletedSiteAdmin.toString() + " from site admin repository";
     }
 }

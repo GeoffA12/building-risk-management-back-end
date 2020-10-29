@@ -36,11 +36,6 @@ public class SiteMaintenanceManagerController {
     @DeleteMapping(value = "/deleteSiteMaintenanceManager")
     public String deleteSiteMaintenanceManager(@RequestParam(name = "id") String id) {
         SiteMaintenanceManager deletedSiteMaintenanceManager = siteMaintenanceManagerService.deleteSiteMaintenanceManager(id);
-
-        if (deletedSiteMaintenanceManager == null) {
-            return "Site maintenance manager with id: " + id + " not found in site maintenance manager repository";
-        } else {
-            return "Site maintenance manager: " + deletedSiteMaintenanceManager.toString() + " removed from site maintenance manager and user repositories";
-        }
+        return "Site maintenance manager: " + deletedSiteMaintenanceManager.toString() + " removed from site maintenance manager and user repositories";
     }
 }

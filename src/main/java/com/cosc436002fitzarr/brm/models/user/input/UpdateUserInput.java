@@ -4,30 +4,33 @@ import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Objects;
 
 public class UpdateUserInput {
     private String id;
+    private String userId;
     private SiteRole siteRole;
     private String firstName;
     private String lastName;
     private String username;
     private String email;
     private String phone;
-    private String authToken;
+    private List<String> siteIds;
 
     @JsonCreator
-    public UpdateUserInput(@JsonProperty String id, @JsonProperty SiteRole siteRole, @JsonProperty String firstName,
+    public UpdateUserInput(@JsonProperty String id, @JsonProperty String userId, @JsonProperty SiteRole siteRole, @JsonProperty String firstName,
                            @JsonProperty String lastName, @JsonProperty String username, @JsonProperty String email,
-                           @JsonProperty String phone, @JsonProperty String authToken) {
+                           @JsonProperty String phone, @JsonProperty List<String> siteIds) {
         this.id = id;
+        this.userId = userId;
         this.siteRole = siteRole;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.phone = phone;
-        this.authToken = authToken;
+        this.siteIds = siteIds;
     }
 
     public String getId() {
@@ -36,6 +39,14 @@ public class UpdateUserInput {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public SiteRole getSiteRole() {
@@ -86,12 +97,12 @@ public class UpdateUserInput {
         this.phone = phone;
     }
 
-    public String getAuthToken() {
-        return authToken;
+    public List<String> getSiteIds() {
+        return siteIds;
     }
 
-    public void setAuthToken(String phone) {
-        this.authToken = authToken;
+    public void setSiteIds(List<String> siteIds) {
+        this.siteIds = siteIds;
     }
 
     @Override
@@ -100,32 +111,34 @@ public class UpdateUserInput {
         if (o == null || getClass() != o.getClass()) return false;
         UpdateUserInput that = (UpdateUserInput) o;
         return getId().equals(that.getId()) &&
+                getUserId().equals(that.getUserId()) &&
                 getSiteRole() == that.getSiteRole() &&
                 getFirstName().equals(that.getFirstName()) &&
                 getLastName().equals(that.getLastName()) &&
                 getUsername().equals(that.getUsername()) &&
                 getEmail().equals(that.getEmail()) &&
                 getPhone().equals(that.getPhone()) &&
-                getAuthToken().equals(that.getAuthToken());
+                getSiteIds().equals(that.getSiteIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(),
-                getPhone(), getAuthToken());
+        return Objects.hash(getId(), getUserId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(),
+                getPhone(), getSiteIds());
     }
 
     @Override
     public String toString() {
         return "UpdateUserInput{" +
                 "id=" + id +
+                "userid=" + userId +
                 "siteRole=" + siteRole + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", authToken='" + authToken + '\'' +
+                ", siteIds='" + siteIds + '\'' +
                 '}';
     }
 }

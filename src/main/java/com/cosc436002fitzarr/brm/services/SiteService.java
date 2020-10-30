@@ -101,15 +101,7 @@ public class SiteService {
     }
 
     public List<Site> getSites(GetSitesInput input) {
-        List<String> test = input.getSiteIds()
-                .stream()
-                .map(ReferenceInput::getId)
-                .collect(Collectors.toList());
-        List<String> ids = new ArrayList<>();
-        for (ReferenceInput reference : input.getSiteIds()) {
-            ids.add(reference.getId());
-        }
-        Iterable<Site> siteIterator = siteRepository.findAllById(ids);
+        Iterable<Site> siteIterator = siteRepository.findAllById(input.getSiteIds());
         List<Site> siteList = StreamSupport
                 .stream(siteIterator.spliterator(), false)
                 .collect(Collectors.toList());

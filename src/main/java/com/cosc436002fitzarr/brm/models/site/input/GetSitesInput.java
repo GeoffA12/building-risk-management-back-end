@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.Objects;
 
 public class GetSitesInput {
-    private List<ReferenceInput> siteIds;
+    private List<String> siteIds;
 
     @JsonCreator
-    public GetSitesInput(@JsonProperty("siteIds") List<ReferenceInput> siteIds) {
+    public GetSitesInput(@JsonProperty("siteIds") List<String> siteIds) {
         this.siteIds = siteIds;
     }
 
-    public List<ReferenceInput> getSiteIds() {
+    public List<String> getSiteIds() {
         return siteIds;
     }
 
-    public void setSiteIds(List<ReferenceInput> siteIds) {
+    public void setSiteIds(List<String> siteIds) {
         this.siteIds = siteIds;
     }
 

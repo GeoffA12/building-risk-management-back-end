@@ -97,7 +97,7 @@ public class SiteMaintenanceManagerService {
 
         // TODO: Refactor the UpdateUserInput class so that a publisherId in the input object. Otherwise, we have no way of knowing the ID of whoever is updating this
         // specific site admin and can't update the Entity Trail accordingly.
-        EntityTrail updateTrail = new EntityTrail(currentTime, existingSiteMaintenanceManager.getId(), getUpdatedSiteMaintenanceManagerSystemComment());
+        EntityTrail updateTrail = new EntityTrail(currentTime, input.getUserId(), getUpdatedSiteMaintenanceManagerSystemComment());
 
         List<EntityTrail> existingTrail = existingSiteMaintenanceManager.getEntityTrail();
 
@@ -117,9 +117,9 @@ public class SiteMaintenanceManagerService {
             input.getUsername(),
             input.getEmail(),
             input.getPhone(),
-            input.getAuthToken(),
+            existingSiteMaintenanceManager.getAuthToken(),
             existingSiteMaintenanceManager.getHashPassword(),
-            existingSiteMaintenanceManager.getAssociatedSiteIds(),
+            input.getSiteIds(),
             existingSiteMaintenanceManager.getSiteMaintenanceAssociateIds()
         );
 

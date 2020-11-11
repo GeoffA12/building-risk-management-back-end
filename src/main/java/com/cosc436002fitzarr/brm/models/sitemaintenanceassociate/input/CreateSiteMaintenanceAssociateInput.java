@@ -1,4 +1,6 @@
-package com.cosc436002fitzarr.brm.models.user.input;
+package com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.input;
+
+import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 
 import java.util.Objects;
 

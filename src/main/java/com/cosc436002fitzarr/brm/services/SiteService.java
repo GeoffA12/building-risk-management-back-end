@@ -4,6 +4,8 @@ import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.*;
+import com.cosc436002fitzarr.brm.models.siteadmin.SiteAdmin;
+import com.cosc436002fitzarr.brm.repositories.SiteAdminRepository;
 import com.cosc436002fitzarr.brm.repositories.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +24,12 @@ import java.util.stream.StreamSupport;
 // TODO: Implement a '/removeUserIdFromUserIdList' that will be called when a user is deleted.
 @Service
 public class SiteService {
-
     @Autowired
     private SiteRepository siteRepository;
+    @Autowired
+    private SiteAdminRepository siteAdminRepository;
+    @Autowired
+    private SiteAdminService siteAdminService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteService.class);
 
@@ -36,6 +41,10 @@ public class SiteService {
 
         List<EntityTrail> entityList = new ArrayList<>();
         List<String> userIds = new ArrayList<>();
+        List<SiteAdmin> allSiteAdmins = siteAdminRepository.findAll();
+        for (SiteAdmin siteAdmin : allSiteAdmins) {
+            userIds.add(siteAdmin.getId());
+        }
         entityList.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedSiteSystemComment()));
         Site siteForPersistence = new Site(
             id,
@@ -48,15 +57,16 @@ public class SiteService {
             input.getAddress(),
             userIds
         );
-        Site persistedSite;
+
         try {
-            persistedSite = siteRepository.save(siteForPersistence);
-            LOGGER.info("Site: " + persistedSite.toString() + " saved in site repository");
+            siteRepository.save(siteForPersistence);
+            LOGGER.info("Site: " + siteForPersistence.toString() + " saved in site repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
         }
-        return persistedSite;
+        siteAdminService.attachNewSiteToAllSiteAdmins(siteForPersistence.getId(), input.getPublisherId());
+        return siteForPersistence;
     }
 
     public Site getById(String id) {
@@ -111,7 +121,7 @@ public class SiteService {
     public Site updateSite(UpdateSiteInput input) {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
-        Site updatedSite = getUpdatedSite(input);
+        Site updatedSite = getUpdatedSite(input.getId(), input.getUserId());
 
         Site updatedSiteForPersistence = new Site(
             updatedSite.getId(),
@@ -135,10 +145,10 @@ public class SiteService {
         return updatedSiteForPersistence;
     }
 
-    public Site getUpdatedSite(UpdateSiteInput input) {
+    public Site getUpdatedSite(String existingSiteId, String userId) {
         Site existingSite;
         try {
-            existingSite = siteRepository.getById(input.getReferenceInput().getId());
+            existingSite = siteRepository.getById(existingSiteId);
             LOGGER.info("Successfully retrieved site: " + existingSite.toString() + " out of repository to update.");
         } catch (Exception e) {
             LOGGER.info(e.toString());
@@ -146,7 +156,7 @@ public class SiteService {
         }
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
-        EntityTrail updateTrail = new EntityTrail(currentTime, input.getUserId(), getUpdatedSiteSystemComment());
+        EntityTrail updateTrail = new EntityTrail(currentTime, userId, getUpdatedSiteSystemComment());
 
         List<EntityTrail> existingTrail = existingSite.getEntityTrail();
 
@@ -172,32 +182,52 @@ public class SiteService {
         return deletedSite;
     }
 
-    public void attachUserIdToUserIdList(String existingSiteId, String userId) {
-        UpdateSiteInput updateSiteInput = new UpdateSiteInput(userId, new ReferenceInput(existingSiteId), null, null, null);
-        Site updatedSite = getUpdatedSite(updateSiteInput);
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-        List<String> existingUserIdList = updatedSite.getUserIds();
-        List<String> newUserIdList = new ArrayList<>(existingUserIdList);
-        newUserIdList.add(userId);
+    public void attachUserIdToUserIdList(List<String> existingSiteIds, String userId) {
+        List<Site> allSitesUserRegisteredAt = siteRepository.findSitesById(existingSiteIds);
+        for (Site site : allSitesUserRegisteredAt) {
+            Site updatedSite = getUpdatedSite(site.getId(), userId);
+            LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+            List<String> existingUserIdList = updatedSite.getUserIds();
+            List<String> newUserIdList = new ArrayList<>(existingUserIdList);
+            newUserIdList.add(userId);
 
-        Site updatedSiteForPersistence = new Site(
-            updatedSite.getId(),
-            updatedSite.getCreatedAt(),
-            currentTime,
-            updatedSite.getEntityTrail(),
-            updatedSite.getPublisherId(),
-            updatedSite.getSiteName(),
-            updatedSite.getSiteCode(),
-            updatedSite.getAddress(),
-            newUserIdList
-        );
+            Site updatedSiteForPersistence = new Site(
+                    updatedSite.getId(),
+                    updatedSite.getCreatedAt(),
+                    currentTime,
+                    updatedSite.getEntityTrail(),
+                    updatedSite.getPublisherId(),
+                    updatedSite.getSiteName(),
+                    updatedSite.getSiteCode(),
+                    updatedSite.getAddress(),
+                    newUserIdList
+            );
 
-        try {
-            siteRepository.save(updatedSiteForPersistence);
-            LOGGER.info("Site " + updatedSiteForPersistence.toString() + " saved in site repository");
-        } catch (Exception e) {
-            LOGGER.info(e.toString());
-            throw new RuntimeException(e);
+            try {
+                siteRepository.save(updatedSiteForPersistence);
+                LOGGER.info("Site " + updatedSiteForPersistence.toString() + " saved in site repository");
+            } catch (Exception e) {
+                LOGGER.info(e.toString());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void removeAssociatedSiteIdsFromSites(List<String> associatedSiteIds, String userIdToDelete, String userIdWhoDeletedUser) {
+        List<Site> associatedSites = siteRepository.findSitesById(associatedSiteIds);
+        for (Site site : associatedSites) {
+            Site updatedSite = getUpdatedSite(site.getId(), userIdWhoDeletedUser);
+            List<String> existingUserIds = updatedSite.getUserIds();
+            existingUserIds.remove(userIdToDelete);
+            site.setUserIds(existingUserIds);
+
+            try {
+                siteRepository.save(updatedSite);
+                LOGGER.info("Site: " + updatedSite.toString() + " saved site repository.");
+            } catch (Exception e) {
+                LOGGER.info(e.toString());
+                throw new RuntimeException(e);
+            }
         }
     }
 

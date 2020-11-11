@@ -1,6 +1,6 @@
 package com.cosc436002fitzarr.brm.repositories;
 
-import com.cosc436002fitzarr.brm.models.user.SiteAdmin;
+import com.cosc436002fitzarr.brm.models.siteadmin.SiteAdmin;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

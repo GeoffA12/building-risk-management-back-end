@@ -1,8 +1,9 @@
-package com.cosc436002fitzarr.brm.models.user;
+package com.cosc436002fitzarr.brm.models.sitemaintenancemanager;
 
 import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.user.User;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -45,6 +46,7 @@ public class SiteMaintenanceManager extends User implements Entity {
     @Override
     public String toString() {
         return "SiteMaintenanceManager{" +
+                super.toString() +
                 "siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 '}';
     }

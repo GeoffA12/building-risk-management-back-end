@@ -1,6 +1,6 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.user.SiteMaintenanceManager;
+import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.services.SiteMaintenanceManagerService;
@@ -34,8 +34,8 @@ public class SiteMaintenanceManagerController {
     }
 
     @DeleteMapping(value = "/deleteSiteMaintenanceManager")
-    public String deleteSiteMaintenanceManager(@RequestParam(name = "id") String id) {
-        SiteMaintenanceManager deletedSiteMaintenanceManager = siteMaintenanceManagerService.deleteSiteMaintenanceManager(id);
+    public String deleteSiteMaintenanceManager(@RequestParam(name = "id") String id, @RequestParam(name = "userId") String userId) {
+        SiteMaintenanceManager deletedSiteMaintenanceManager = siteMaintenanceManagerService.deleteSiteMaintenanceManager(id, userId);
         return "Site maintenance manager: " + deletedSiteMaintenanceManager.toString() + " removed from site maintenance manager and user repositories";
     }
 }

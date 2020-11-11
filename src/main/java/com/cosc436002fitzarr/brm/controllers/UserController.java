@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping("/getAllUsersBySite")
     public Map<String, Object> getAllUsersBySite(@RequestBody GetAllUsersBySiteInput input) {
         LOGGER.info(input.toString());
-        return userService.getAllUsersBySite(input.getPageInput(), input.getSiteIds());
+        return userService.getAllUsersBySite(input.getPageInput(), input.getSiteIds(), input.getUserId());
     }
 
     @GetMapping(value = "/getUsersBySiteRole", produces = "application/json")

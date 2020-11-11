@@ -1,11 +1,12 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
-import com.cosc436002fitzarr.brm.models.user.WorkplaceHealthSafetyMember;
+import com.cosc436002fitzarr.brm.models.workplacehealthsafetymember.WorkplaceHealthSafetyMember;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
 import com.cosc436002fitzarr.brm.repositories.WorkplaceHealthSafetyMemberRepository;
+import com.cosc436002fitzarr.brm.utils.UserAPIHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class WorkplaceHealthSafetyMemberService {
             throw new RuntimeException();
         }
 
-        siteService.attachUserIdToUserIdList(input.getSiteId(), workplaceHealthSafetyMemberForPersistence.getId());
+        siteService.attachUserIdToUserIdList(associatedSiteIds, workplaceHealthSafetyMemberForPersistence.getId());
         return workplaceHealthSafetyMemberForPersistence;
     }
 
@@ -115,8 +116,8 @@ public class WorkplaceHealthSafetyMemberService {
             currentTime,
             existingWorkplaceHealthSafetyMember.getCreatedAt(),
             updatedTrail,
-            existingWorkplaceHealthSafetyMember.getId(),
-            input.getSiteRole(),
+            input.getUserId(),
+            existingWorkplaceHealthSafetyMember.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
@@ -142,18 +143,21 @@ public class WorkplaceHealthSafetyMemberService {
         return updatedWorkplaceHealthSafetyMemberForPersistence;
     }
 
-    public WorkplaceHealthSafetyMember deleteWorkplaceHealthSafetyMember(String id) {
+    public WorkplaceHealthSafetyMember deleteWorkplaceHealthSafetyMember(String id, String userId) {
+        UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
         Optional<WorkplaceHealthSafetyMember> potentialWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberRepository.findById(id);
         Boolean workplaceHealthSafetyMemberPresent = potentialWorkplaceHealthSafetyMember.isPresent();
         if (!workplaceHealthSafetyMemberPresent) {
             LOGGER.info("Site maintenance associate with id: " + id + " not found in the site maintenance associate repository!");
-            throw new EntityNotFoundException("Site maintenance associate with id: \" + id + \" not found in the site maintenance associate repository!");
+            throw new EntityNotFoundException("Site maintenance associate with id: " + id + " not found in the site maintenance associate repository!");
         } else {
             workplaceHealthSafetyMemberRepository.deleteById(id);
             userRepository.deleteById(id);
             LOGGER.info("Workplace health and safety member: " + potentialWorkplaceHealthSafetyMember.get().toString() + " successfully fetched and " +
                     "deleted from workplace health and safety and user repositories");
-            return potentialWorkplaceHealthSafetyMember.get();
+            WorkplaceHealthSafetyMember deletedWorkplaceHealthSafetyMember = potentialWorkplaceHealthSafetyMember.get();
+            siteService.removeAssociatedSiteIdsFromSites(deletedWorkplaceHealthSafetyMember.getAssociatedSiteIds(), deletedWorkplaceHealthSafetyMember.getId(), userId);
+            return deletedWorkplaceHealthSafetyMember;
         }
     }
 

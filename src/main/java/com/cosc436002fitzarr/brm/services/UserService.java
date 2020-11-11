@@ -33,12 +33,9 @@ public class UserService {
     @Autowired
     public UserRepository userRepository;
     @Autowired
-    public SiteAdminService siteAdminService;
-    @Autowired
     public SiteService siteService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
@@ -93,7 +90,7 @@ public class UserService {
     }
 
     // 2) We already have a built in .findAllById(List<String> ids) method. Use this in other APIs.
-    public Map<String, Object> getAllUsersBySite(PageInput input, List<String> siteIds) {
+    public Map<String, Object> getAllUsersBySite(PageInput input, List<String> siteIds, String userId) {
 
         Sort sortProperty = Sort.by(input.getSortDirection(), input.getSortBy());
         Pageable page = PageRequest.of(input.getPageNo().intValue(), input.getPageSize().intValue(), sortProperty);
@@ -104,7 +101,7 @@ public class UserService {
         // and the site ID list of the user stored in the repository. If any of the site ID's are contained in both the input user list and the repository user list,
         // then we have a match, and will return this user in the page
         List<User> filteredUsersBySite = userPageContent.stream()
-                .filter(user -> !Collections.disjoint(user.getAssociatedSiteIds(), siteIds))
+                .filter(user -> !Collections.disjoint(user.getAssociatedSiteIds(), siteIds) && !user.getId().equals(userId))
                 .collect(Collectors.toList());
 
         Map<String, Object> userResponseMap = PageUtils.getUserMappingResponse(userPages, filteredUsersBySite);

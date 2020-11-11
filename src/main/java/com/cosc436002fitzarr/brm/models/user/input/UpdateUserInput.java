@@ -10,7 +10,6 @@ import java.util.Objects;
 public class UpdateUserInput {
     private String id;
     private String userId;
-    private SiteRole siteRole;
     private String firstName;
     private String lastName;
     private String username;
@@ -19,12 +18,11 @@ public class UpdateUserInput {
     private List<String> siteIds;
 
     @JsonCreator
-    public UpdateUserInput(@JsonProperty String id, @JsonProperty String userId, @JsonProperty SiteRole siteRole, @JsonProperty String firstName,
+    public UpdateUserInput(@JsonProperty String id, @JsonProperty String userId, @JsonProperty String firstName,
                            @JsonProperty String lastName, @JsonProperty String username, @JsonProperty String email,
                            @JsonProperty String phone, @JsonProperty List<String> siteIds) {
         this.id = id;
         this.userId = userId;
-        this.siteRole = siteRole;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -47,14 +45,6 @@ public class UpdateUserInput {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public SiteRole getSiteRole() {
-        return siteRole;
-    }
-
-    public void setSiteRole(SiteRole siteRole) {
-        this.siteRole = siteRole;
     }
 
     public String getFirstName() {
@@ -112,7 +102,6 @@ public class UpdateUserInput {
         UpdateUserInput that = (UpdateUserInput) o;
         return getId().equals(that.getId()) &&
                 getUserId().equals(that.getUserId()) &&
-                getSiteRole() == that.getSiteRole() &&
                 getFirstName().equals(that.getFirstName()) &&
                 getLastName().equals(that.getLastName()) &&
                 getUsername().equals(that.getUsername()) &&
@@ -123,7 +112,7 @@ public class UpdateUserInput {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getSiteRole(), getFirstName(), getLastName(), getUsername(), getEmail(),
+        return Objects.hash(getId(), getUserId(), getFirstName(), getLastName(), getUsername(), getEmail(),
                 getPhone(), getSiteIds());
     }
 
@@ -132,7 +121,6 @@ public class UpdateUserInput {
         return "UpdateUserInput{" +
                 "id=" + id +
                 "userid=" + userId +
-                "siteRole=" + siteRole + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +

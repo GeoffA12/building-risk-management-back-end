@@ -3,11 +3,14 @@ package com.cosc436002fitzarr.brm.controllers;
 import com.cosc436002fitzarr.brm.models.workplacehealthsafetymember.WorkplaceHealthSafetyMember;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
+import com.cosc436002fitzarr.brm.models.workplacehealthsafetymember.input.GetWorkplaceHealthSafetyMembersBySiteInput;
 import com.cosc436002fitzarr.brm.services.WorkplaceHealthSafetyMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class WorkplaceHealthSafetyMemberController {
@@ -38,5 +41,11 @@ public class WorkplaceHealthSafetyMemberController {
         WorkplaceHealthSafetyMember deletedWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberService.deleteWorkplaceHealthSafetyMember(id, userId);
         return "Workplace health safety member: " + deletedWorkplaceHealthSafetyMember.toString() + " successfully deleted " +
                     "from workplace health and safety and user repositories";
+    }
+
+    @PostMapping(value = "/getWorkplaceHealthSafetyMembersBySite")
+    public List<WorkplaceHealthSafetyMember> getWorkplaceHealthSafetyMembersBySite(@RequestBody GetWorkplaceHealthSafetyMembersBySiteInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(requestBody.getUserId(), requestBody.getAssociatedSiteIds());
     }
 }

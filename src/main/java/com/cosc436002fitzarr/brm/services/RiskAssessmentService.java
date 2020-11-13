@@ -63,6 +63,7 @@ public class RiskAssessmentService {
             LOGGER.info(e.toString());
             throw new RuntimeException();
         }
+        workplaceHealthSafetyMemberService.attachRiskAssessmentIdToWorkplaceHealthSafetyMemberIdList(id, input.getPublisherId());
         return riskAssessmentForPersistence;
     }
 
@@ -171,6 +172,7 @@ public class RiskAssessmentService {
             // TODO: who submitted this risk assessments ID list so that it no longer contains the id of the deleted risk assessment.
             // TODO: Get the whs member using the publisherId passed into this API. You'll need to write a service function in the whsmemberservice file which
             // TODO: will update the whs member's riskAssessmentFiledId's list (it should remove the id from their list and then save that update)
+            workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(id, publisherId);
             return deletedRiskAssessment;
         }
     }

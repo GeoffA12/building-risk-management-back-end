@@ -1,6 +1,7 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.models.workplacehealthsafetymember.WorkplaceHealthSafetyMember;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -158,6 +159,110 @@ public class WorkplaceHealthSafetyMemberService {
             WorkplaceHealthSafetyMember deletedWorkplaceHealthSafetyMember = potentialWorkplaceHealthSafetyMember.get();
             siteService.removeAssociatedSiteIdsFromSites(deletedWorkplaceHealthSafetyMember.getAssociatedSiteIds(), deletedWorkplaceHealthSafetyMember.getId(), userId);
             return deletedWorkplaceHealthSafetyMember;
+        }
+    }
+
+    public void attachRiskAssessmentIdToWorkplaceHealthSafetyMemberIdList(String riskAssessmentId, String existingWorkplaceHealthSafetyMemberId) {
+        Optional<WorkplaceHealthSafetyMember> potentialWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberRepository.findById(existingWorkplaceHealthSafetyMemberId);
+        if (!potentialWorkplaceHealthSafetyMember.isPresent()) {
+            throw new EntityNotFoundException("Workplace Health Safety Member with id: " + existingWorkplaceHealthSafetyMemberId + " not found in workplace health safety member repository!");
+        }
+
+        WorkplaceHealthSafetyMember existingWorkplaceHealthSafetyMember = potentialWorkplaceHealthSafetyMember.get();
+        LOGGER.info("Successfully retrieved workplace health safety member: " + existingWorkplaceHealthSafetyMember.toString() + " out of repository to update.");
+
+        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+
+        EntityTrail updateTrail = new EntityTrail(currentTime, existingWorkplaceHealthSafetyMember.getId(), getUpdatedWorkplaceHealthSafetyMemberSystemComment());
+
+        List<EntityTrail> existingTrail = existingWorkplaceHealthSafetyMember.getEntityTrail();
+
+        List<EntityTrail> updatedTrail = new ArrayList<>(existingTrail);
+
+        updatedTrail.add(updateTrail);
+
+        List<String> updatedRiskAssessmentsFiledIds = new ArrayList<>(existingWorkplaceHealthSafetyMember.getRiskAssessmentsFiledIds());
+
+        updatedRiskAssessmentsFiledIds.add(riskAssessmentId);
+
+        WorkplaceHealthSafetyMember updatedWorkplaceHealthSafetyMemberForPersistence = new WorkplaceHealthSafetyMember(
+                existingWorkplaceHealthSafetyMember.getId(),
+                currentTime,
+                existingWorkplaceHealthSafetyMember.getCreatedAt(),
+                updatedTrail,
+                existingWorkplaceHealthSafetyMember.getId(),
+                existingWorkplaceHealthSafetyMember.getSiteRole(),
+                existingWorkplaceHealthSafetyMember.getFirstName(),
+                existingWorkplaceHealthSafetyMember.getLastName(),
+                existingWorkplaceHealthSafetyMember.getUsername(),
+                existingWorkplaceHealthSafetyMember.getEmail(),
+                existingWorkplaceHealthSafetyMember.getPhone(),
+                existingWorkplaceHealthSafetyMember.getAuthToken(),
+                existingWorkplaceHealthSafetyMember.getHashPassword(),
+                existingWorkplaceHealthSafetyMember.getAssociatedSiteIds(),
+                updatedRiskAssessmentsFiledIds
+        );
+
+        try {
+            workplaceHealthSafetyMemberRepository.save(updatedWorkplaceHealthSafetyMemberForPersistence);
+            LOGGER.info("Workplace health safety member: " + updatedWorkplaceHealthSafetyMemberForPersistence.toString() + " saved in workplace health safety member repository");
+            userRepository.save(updatedWorkplaceHealthSafetyMemberForPersistence);
+            LOGGER.info("Workplace health safety member: " + updatedWorkplaceHealthSafetyMemberForPersistence.toString() + " saved in user repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(String riskAssessmentId, String existingWorkplaceHealthSafetyMemberId) {
+        Optional<WorkplaceHealthSafetyMember> potentialWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberRepository.findById(existingWorkplaceHealthSafetyMemberId);
+        if (!potentialWorkplaceHealthSafetyMember.isPresent()) {
+            throw new EntityNotFoundException("Workplace Health Safety Member with id: " + existingWorkplaceHealthSafetyMemberId + " not found in workplace health safety member repository!");
+        }
+
+        WorkplaceHealthSafetyMember existingWorkplaceHealthSafetyMember = potentialWorkplaceHealthSafetyMember.get();
+        LOGGER.info("Successfully retrieved workplace health safety member: " + existingWorkplaceHealthSafetyMember.toString() + " out of repository to update.");
+
+        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+
+        EntityTrail updateTrail = new EntityTrail(currentTime, existingWorkplaceHealthSafetyMember.getId(), getUpdatedWorkplaceHealthSafetyMemberSystemComment());
+
+        List<EntityTrail> existingTrail = existingWorkplaceHealthSafetyMember.getEntityTrail();
+
+        List<EntityTrail> updatedTrail = new ArrayList<>(existingTrail);
+
+        updatedTrail.add(updateTrail);
+
+        List<String> updatedRiskAssessmentsFiledIds = new ArrayList<>(existingWorkplaceHealthSafetyMember.getRiskAssessmentsFiledIds());
+
+        updatedRiskAssessmentsFiledIds.remove(riskAssessmentId);
+
+        WorkplaceHealthSafetyMember updatedWorkplaceHealthSafetyMemberForPersistence = new WorkplaceHealthSafetyMember(
+                existingWorkplaceHealthSafetyMember.getId(),
+                currentTime,
+                existingWorkplaceHealthSafetyMember.getCreatedAt(),
+                updatedTrail,
+                existingWorkplaceHealthSafetyMember.getId(),
+                existingWorkplaceHealthSafetyMember.getSiteRole(),
+                existingWorkplaceHealthSafetyMember.getFirstName(),
+                existingWorkplaceHealthSafetyMember.getLastName(),
+                existingWorkplaceHealthSafetyMember.getUsername(),
+                existingWorkplaceHealthSafetyMember.getEmail(),
+                existingWorkplaceHealthSafetyMember.getPhone(),
+                existingWorkplaceHealthSafetyMember.getAuthToken(),
+                existingWorkplaceHealthSafetyMember.getHashPassword(),
+                existingWorkplaceHealthSafetyMember.getAssociatedSiteIds(),
+                updatedRiskAssessmentsFiledIds
+        );
+
+        try {
+            workplaceHealthSafetyMemberRepository.save(updatedWorkplaceHealthSafetyMemberForPersistence);
+            LOGGER.info("Workplace health safety member: " + updatedWorkplaceHealthSafetyMemberForPersistence.toString() + " saved in workplace health safety member repository");
+            userRepository.save(updatedWorkplaceHealthSafetyMemberForPersistence);
+            LOGGER.info("Workplace health safety member: " + updatedWorkplaceHealthSafetyMemberForPersistence.toString() + " saved in user repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
         }
     }
 

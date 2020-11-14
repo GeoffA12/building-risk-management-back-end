@@ -88,6 +88,54 @@ public class RiskAssessment implements Entity {
         this.publisherId = publisherId;
     }
 
+    public Long getWorkOrder() {
+        return workOrder;
+    }
+
+    public void setWorkOrder(Long workOrder) {
+        this.workOrder = workOrder;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public List<Hazard> getHazards() {
+        return hazards;
+    }
+
+    public void setHazards(List<Hazard> hazards) {
+        this.hazards = hazards;
+    }
+
+    public List<Screener> getScreeners() {
+        return screeners;
+    }
+
+    public void setScreeners(List<Screener> screeners) {
+        this.screeners = screeners;
+    }
+
+    public List<String> getSiteIds() {
+        return siteIds;
+    }
+
+    public void setSiteIds(List<String> siteIds) {
+        this.siteIds = siteIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,17 +146,17 @@ public class RiskAssessment implements Entity {
                 getUpdatedAt().equals(that.getUpdatedAt()) &&
                 getEntityTrail().equals(that.getEntityTrail()) &&
                 getPublisherId().equals(that.getPublisherId()) &&
-                workOrder.equals(that.workOrder) &&
-                title.equals(that.title) &&
-                taskDescription.equals(that.taskDescription) &&
-                hazards.equals(that.hazards) &&
-                screeners.equals(that.screeners) &&
-                siteIds.equals(that.siteIds);
+                getWorkOrder().equals(that.getWorkOrder()) &&
+                getTitle().equals(that.getTitle()) &&
+                getTaskDescription().equals(that.getTaskDescription()) &&
+                getHazards().equals(that.getHazards()) &&
+                getScreeners().equals(that.getScreeners()) &&
+                getSiteIds().equals(that.getSiteIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), workOrder, title, taskDescription, hazards, screeners, siteIds);
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getSiteIds());
     }
 
     @Override

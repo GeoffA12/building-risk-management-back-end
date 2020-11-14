@@ -15,19 +15,17 @@ public class CreateRiskAssessmentInput {
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
-    private List<String> siteIds;
 
     @JsonCreator
     public CreateRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty Long workOrder, @JsonProperty String title,
                                      @JsonProperty String taskDescription, @JsonProperty List<Hazard> hazards,
-                                     @JsonProperty List<Screener> screeners, @JsonProperty List<String> siteIds) {
+                                     @JsonProperty List<Screener> screeners) {
         this.publisherId = publisherId;
         this.workOrder = workOrder;
         this.title = title;
         this.taskDescription = taskDescription;
         this.hazards = hazards;
         this.screeners = screeners;
-        this.siteIds = siteIds;
     }
 
     public String getPublisherId() {
@@ -78,14 +76,6 @@ public class CreateRiskAssessmentInput {
         this.screeners = screeners;
     }
 
-    public List<String> getSiteIds() {
-        return siteIds;
-    }
-
-    public void setSiteIds(List<String> siteIds) {
-        this.siteIds = siteIds;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,13 +86,12 @@ public class CreateRiskAssessmentInput {
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
                 Objects.equals(getHazards(), that.getHazards()) &&
-                Objects.equals(getScreeners(), that.getScreeners()) &&
-                Objects.equals(getSiteIds(), that.getSiteIds());
+                Objects.equals(getScreeners(), that.getScreeners());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getSiteIds());
+        return Objects.hash(getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
     }
 
     @Override
@@ -114,7 +103,6 @@ public class CreateRiskAssessmentInput {
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +
                 ", screeners=" + screeners +
-                ", siteIds=" + siteIds +
                 '}';
     }
 }

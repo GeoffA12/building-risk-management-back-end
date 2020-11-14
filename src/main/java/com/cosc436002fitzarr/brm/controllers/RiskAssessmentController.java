@@ -20,7 +20,7 @@ public class RiskAssessmentController {
 
     private static Logger LOGGER = LoggerFactory.getLogger(RiskAssessmentController.class);
 
-    @PutMapping(value = "/updateRiskAssessment", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/updateRiskAssessment", consumes = "application/json", produces = "application/json")
     public RiskAssessment updateRiskAssessment(@RequestBody UpdateRiskAssessmentInput requestBody) {
         LOGGER.info(requestBody.toString());
         return riskAssessmentService.updateRiskAssessment(requestBody);
@@ -38,7 +38,7 @@ public class RiskAssessmentController {
     }
 
     @DeleteMapping(value = "/deleteRiskAssessment")
-    public String deleteRiskAssessment(@RequestParam(name="id") String id, @RequestParam(name="publisherid") String publisherId) {
+    public String deleteRiskAssessment(@RequestParam(name="id") String id, @RequestParam(name="publisherId") String publisherId) {
         RiskAssessment deletedRiskAssessment = riskAssessmentService.deleteRiskAssessment(id, publisherId);
         return "Deleted: " + deletedRiskAssessment.toString() + " from risk assessment repository";
     }

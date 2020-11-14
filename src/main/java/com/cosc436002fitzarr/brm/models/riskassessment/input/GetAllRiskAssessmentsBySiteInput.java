@@ -10,13 +10,11 @@ import java.util.Objects;
 public class GetAllRiskAssessmentsBySiteInput {
     private PageInput pageInput;
     private List<String> associatedSiteIds;
-    private String userId;
 
     @JsonCreator
     public GetAllRiskAssessmentsBySiteInput(@JsonProperty PageInput pageInput, @JsonProperty List<String> associatedSiteIds, @JsonProperty String userId) {
         this.pageInput = pageInput;
         this.associatedSiteIds = associatedSiteIds;
-        this.userId = userId;
     }
 
     public PageInput getPageInput() {
@@ -35,27 +33,18 @@ public class GetAllRiskAssessmentsBySiteInput {
         this.associatedSiteIds = associatedSiteIds;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GetAllRiskAssessmentsBySiteInput that = (GetAllRiskAssessmentsBySiteInput) o;
         return getPageInput().equals(that.getPageInput()) &&
-                getAssociatedSiteIds().equals(that.getAssociatedSiteIds()) &&
-                getUserId().equals(that.getUserId());
+                getAssociatedSiteIds().equals(that.getAssociatedSiteIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPageInput(), getAssociatedSiteIds(), getUserId());
+        return Objects.hash(getPageInput(), getAssociatedSiteIds());
     }
 
     @Override
@@ -63,7 +52,6 @@ public class GetAllRiskAssessmentsBySiteInput {
         return "GetAllRiskAssessmentsBySiteInput{" +
                 "pageInput=" + pageInput +
                 ", associatedSiteIds=" + associatedSiteIds +
-                ", userId='" + userId + '\'' +
                 '}';
     }
 }

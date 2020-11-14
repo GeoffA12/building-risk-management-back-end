@@ -42,10 +42,4 @@ public class WorkplaceHealthSafetyMemberController {
         return "Workplace health safety member: " + deletedWorkplaceHealthSafetyMember.toString() + " successfully deleted " +
                     "from workplace health and safety and user repositories";
     }
-
-    @PostMapping(value = "/getWorkplaceHealthSafetyMembersBySite")
-    public List<WorkplaceHealthSafetyMember> getWorkplaceHealthSafetyMembersBySite(@RequestBody GetWorkplaceHealthSafetyMembersBySiteInput requestBody) {
-        LOGGER.info(requestBody.toString());
-        return workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(requestBody.getUserId(), requestBody.getAssociatedSiteIds());
-    }
 }

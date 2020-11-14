@@ -38,6 +38,7 @@ public class RiskAssessmentService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
         List<EntityTrail> entityTrail = new ArrayList<>();
         entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedRiskAssessmentMessage()));
+        List<String> siteIds = new ArrayList<>();
 
         RiskAssessment riskAssessmentForPersistence = new RiskAssessment(
             id,
@@ -50,7 +51,7 @@ public class RiskAssessmentService {
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            input.getSiteIds()
+            siteIds
         );
 
         try {
@@ -77,7 +78,7 @@ public class RiskAssessmentService {
             updatedRiskAssessment.getCreatedAt(),
             currentTime,
             updatedRiskAssessment.getEntityTrail(),
-            updatedRiskAssessment.getPublisherId(),
+            input.getPublisherId(),
             input.getWorkOrder(),
             input.getTitle(),
             input.getTaskDescription(),
@@ -142,7 +143,7 @@ public class RiskAssessmentService {
         Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
         List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
 
-        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getUserId(), input.getAssociatedSiteIds());
+        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getAssociatedSiteIds());
         List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
         for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
             whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());

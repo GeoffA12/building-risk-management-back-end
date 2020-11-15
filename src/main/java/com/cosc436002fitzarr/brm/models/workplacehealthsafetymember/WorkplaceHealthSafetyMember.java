@@ -12,6 +12,7 @@ import java.util.Objects;
 
 @Document(collection = "workplacehealthsafetymember")
 public class WorkplaceHealthSafetyMember extends User implements Entity {
+    // TODO: Add a location field to this user since when they file risk assessments, we'll want to know where they are located, where they work, etc.
     private List<String> riskAssessmentsFiledIds;
 
     public WorkplaceHealthSafetyMember(String id, LocalDateTime updatedAt, LocalDateTime createdAt, List<EntityTrail> entityTrail,

@@ -1,7 +1,7 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.user.SiteMaintenanceAssociate;
-import com.cosc436002fitzarr.brm.models.user.input.CreateSiteMaintenanceAssociateInput;
+import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
+import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.input.CreateSiteMaintenanceAssociateInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.services.SiteMaintenanceAssociateService;
 import org.slf4j.Logger;
@@ -34,8 +34,8 @@ public class SiteMaintenanceAssociateController {
     }
 
     @DeleteMapping(value = "/deleteSiteMaintenanceAssociate")
-    public String deleteSiteMaintenanceAssociate(@RequestParam(name = "id") String id) {
-        SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(id);
+    public String deleteSiteMaintenanceAssociate(@RequestParam(name = "id") String id, @RequestParam(name="userId") String userId) {
+        SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(id, userId);
         return "Deleted: " + deletedSiteMaintenanceAssociate.toString() + " from site maintenance associate repository";
     }
 }

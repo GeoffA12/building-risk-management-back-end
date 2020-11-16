@@ -1,6 +1,6 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.user.SiteAdmin;
+import com.cosc436002fitzarr.brm.models.siteadmin.SiteAdmin;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 
@@ -40,8 +40,8 @@ public class SiteAdminController {
     }
 
     @DeleteMapping(value = "/deleteSiteAdmin")
-    public String deleteSiteAdmin(@RequestParam(name="id") String id) {
-        SiteAdmin deletedSiteAdmin = siteAdminService.deleteSiteAdmin(id);
+    public String deleteSiteAdmin(@RequestParam(name="id") String id, @RequestParam(name="userid") String userId) {
+        SiteAdmin deletedSiteAdmin = siteAdminService.deleteSiteAdmin(id, userId);
         return "Deleted: " + deletedSiteAdmin.toString() + " from site admin repository";
     }
 }

@@ -1,11 +1,12 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
-import com.cosc436002fitzarr.brm.models.user.SiteMaintenanceAssociate;
-import com.cosc436002fitzarr.brm.models.user.input.CreateSiteMaintenanceAssociateInput;
+import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
+import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.input.CreateSiteMaintenanceAssociateInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.SiteMaintenanceAssociateRepository;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
+import com.cosc436002fitzarr.brm.utils.UserAPIHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class SiteMaintenanceAssociateService {
             LOGGER.info(e.toString());
             throw new RuntimeException();
         }
-        siteService.attachUserIdToUserIdList(input.getCreateUserInput().getSiteId(), siteMaintenanceAssociateForPersistence.getId());
+        siteService.attachUserIdToUserIdList(associatedSiteIds, siteMaintenanceAssociateForPersistence.getId());
         siteMaintenanceManagerService.attachSiteMaintenanceAssociateIdToSiteMaintenanceManagerIdList(siteMaintenanceAssociateForPersistence.getId(), input.getSiteMaintenanceManagerId());
         return siteMaintenanceAssociateForPersistence;
     }
@@ -123,8 +124,8 @@ public class SiteMaintenanceAssociateService {
             currentTime,
             existingSiteMaintenanceAssociate.getCreatedAt(),
             updatedTrail,
-            existingSiteMaintenanceAssociate.getId(),
-            input.getSiteRole(),
+            input.getUserId(),
+            existingSiteMaintenanceAssociate.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
@@ -149,7 +150,8 @@ public class SiteMaintenanceAssociateService {
         return updatedSiteMaintenanceAssociateForPersistence;
     }
 
-    public SiteMaintenanceAssociate deleteSiteMaintenanceAssociate(String id) {
+    public SiteMaintenanceAssociate deleteSiteMaintenanceAssociate(String id, String userId) {
+        UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
         Optional<SiteMaintenanceAssociate> potentialSiteMaintenanceAssociate = siteMaintenanceAssociateRepository.findById(id);
         Boolean siteMaintenanceAssociatePresent = potentialSiteMaintenanceAssociate.isPresent();
         if (!siteMaintenanceAssociatePresent) {
@@ -161,7 +163,9 @@ public class SiteMaintenanceAssociateService {
             userRepository.deleteById(id);
             LOGGER.info("Site maintenance associate: " + potentialSiteMaintenanceAssociate.get().toString() + " successfully fetched and deleted from site maintenance associate" +
                     " and user repositories");
-            return potentialSiteMaintenanceAssociate.get();
+            SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = potentialSiteMaintenanceAssociate.get();
+            siteService.removeAssociatedSiteIdsFromSites(deletedSiteMaintenanceAssociate.getAssociatedSiteIds(), deletedSiteMaintenanceAssociate.getId(), userId);
+            return deletedSiteMaintenanceAssociate;
         }
     }
 

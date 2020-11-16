@@ -1,6 +1,5 @@
 package com.cosc436002fitzarr.brm.models.site.input;
 
-import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Address;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,16 +8,16 @@ import java.util.Objects;
 
 public class UpdateSiteInput {
     private String userId;
-    private ReferenceInput referenceInput;
+    private String id;
     private String siteName;
     private String siteCode;
     private Address address;
 
     @JsonCreator
-    public UpdateSiteInput(@JsonProperty String userId, @JsonProperty ReferenceInput referenceInput,
+    public UpdateSiteInput(@JsonProperty String userId, @JsonProperty String id,
                            @JsonProperty String siteName, @JsonProperty String siteCode, @JsonProperty Address address) {
         this.userId = userId;
-        this.referenceInput = referenceInput;
+        this.id = id;
         this.siteName = siteName;
         this.siteCode = siteCode;
         this.address = address;
@@ -48,12 +47,12 @@ public class UpdateSiteInput {
         this.siteCode = siteCode;
     }
 
-    public ReferenceInput getReferenceInput() {
-        return referenceInput;
+    public String getId() {
+        return id;
     }
 
-    public void setReferenceInput(ReferenceInput referenceInput) {
-        this.referenceInput = referenceInput;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Address getAddress() {
@@ -72,20 +71,20 @@ public class UpdateSiteInput {
         return getUserId().equals(that.getUserId()) &&
                 getSiteName().equals(that.getSiteName()) &&
                 getSiteCode().equals(that.getSiteCode()) &&
-                getReferenceInput().equals(that.getReferenceInput()) &&
+                getId().equals(that.getId()) &&
                 getAddress().equals(that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUserId(), getReferenceInput(), getSiteName(), getSiteCode(), getAddress());
+        return Objects.hash(getUserId(), getId(), getSiteName(), getSiteCode(), getAddress());
     }
 
     @Override
     public String toString() {
         return "UpdateSiteInput{" +
                 "userId='" + userId + '\'' +
-                "referenceInput='" + referenceInput + '\'' +
+                "id='" + id + '\'' +
                 ", siteName='" + siteName + '\'' +
                 ", siteCode='" + siteCode + '\'' +
                 ", address='" + address + '\'' +

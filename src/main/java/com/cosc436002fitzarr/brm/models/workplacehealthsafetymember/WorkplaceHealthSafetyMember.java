@@ -1,8 +1,9 @@
-package com.cosc436002fitzarr.brm.models.user;
+package com.cosc436002fitzarr.brm.models.workplacehealthsafetymember;
 
 import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.user.User;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Objects;
 
 @Document(collection = "workplacehealthsafetymember")
 public class WorkplaceHealthSafetyMember extends User implements Entity {
+    // TODO: Add a location field to this user since when they file risk assessments, we'll want to know where they are located, where they work, etc.
     private List<String> riskAssessmentsFiledIds;
 
     public WorkplaceHealthSafetyMember(String id, LocalDateTime updatedAt, LocalDateTime createdAt, List<EntityTrail> entityTrail,
@@ -45,6 +47,7 @@ public class WorkplaceHealthSafetyMember extends User implements Entity {
     @Override
     public String toString() {
         return "WorkplaceHealthSafetyMember{" +
+                super.toString() +
                 "riskAssessmentsFiledIds=" + riskAssessmentsFiledIds +
                 '}';
     }

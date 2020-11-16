@@ -1,11 +1,12 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
-import com.cosc436002fitzarr.brm.models.user.SiteMaintenanceManager;
+import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
 import com.cosc436002fitzarr.brm.repositories.SiteMaintenanceManagerRepository;
 import com.cosc436002fitzarr.brm.repositories.UserRepository;
+import com.cosc436002fitzarr.brm.utils.UserAPIHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class SiteMaintenanceManagerService {
             LOGGER.info(e.toString());
             throw new RuntimeException();
         }
-        siteService.attachUserIdToUserIdList(input.getSiteId(), siteMaintenanceManagerForPersistence.getId());
+        siteService.attachUserIdToUserIdList(associatedSiteIds, siteMaintenanceManagerForPersistence.getId());
         return siteMaintenanceManagerForPersistence;
     }
 
@@ -110,8 +111,8 @@ public class SiteMaintenanceManagerService {
             currentTime,
             existingSiteMaintenanceManager.getCreatedAt(),
             updatedTrail,
-            existingSiteMaintenanceManager.getId(),
-            input.getSiteRole(),
+            input.getUserId(),
+            existingSiteMaintenanceManager.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
@@ -135,7 +136,8 @@ public class SiteMaintenanceManagerService {
         return updatedSiteMaintenanceManagerForPersistence;
     }
 
-    public SiteMaintenanceManager deleteSiteMaintenanceManager(String id) {
+    public SiteMaintenanceManager deleteSiteMaintenanceManager(String id, String userId) {
+        UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
         Optional<SiteMaintenanceManager> potentialSiteMaintenanceManager = siteMaintenanceManagerRepository.findById(id);
         Boolean siteMaintenanceAssociatePresent = potentialSiteMaintenanceManager.isPresent();
         if (!siteMaintenanceAssociatePresent) {
@@ -147,7 +149,10 @@ public class SiteMaintenanceManagerService {
             userRepository.deleteById(id);
             LOGGER.info("Site maintenance manager: " + potentialSiteMaintenanceManager.get().toString() + " successfully fetched and deleted from site maintenance manager" +
                     " and user repositories");
-            return potentialSiteMaintenanceManager.get();
+            SiteMaintenanceManager siteMaintenanceManagerToDelete = potentialSiteMaintenanceManager.get();
+            List<String> deletedAssociatedSiteIds = siteMaintenanceManagerToDelete.getAssociatedSiteIds();
+            siteService.removeAssociatedSiteIdsFromSites(deletedAssociatedSiteIds, siteMaintenanceManagerToDelete.getId(), userId);
+            return siteMaintenanceManagerToDelete;
         }
     }
 

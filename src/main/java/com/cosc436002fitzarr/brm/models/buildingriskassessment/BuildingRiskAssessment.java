@@ -1,18 +1,17 @@
-package com.cosc436002fitzarr.brm.models.riskassessment;
+package com.cosc436002fitzarr.brm.models.buildingriskassessment;
 
-import com.cosc436002fitzarr.brm.enums.RiskImpact;
-import com.cosc436002fitzarr.brm.enums.RiskLevel;
 import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.riskassessment.Hazard;
+import com.cosc436002fitzarr.brm.models.riskassessment.Screener;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@Document(collection = "riskassessment")
-public class RiskAssessment implements Entity {
+@Document(collection = "buildingriskassessment")
+public class BuildingRiskAssessment implements Entity {
     private String id;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -21,18 +20,16 @@ public class RiskAssessment implements Entity {
     private Long workOrder;
     private String title;
     private String taskDescription;
+    private List<BuildingProfile> buildingProfile;
     private List<Hazard> hazards;
     private List<Screener> screeners;
-    private String buildingId;
+    private List<String> assignedAssociatesIds;
+    private String siteId;
     private Status status;
-    private LocalDateTime dueDate;
-    private RiskLevel riskLevel;
-    private List<String> siteMaintenanceAssociateIds;
 
-    public RiskAssessment(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail,
-                          String publisherId, Long workOrder, String title, String taskDescription, List<Hazard> hazards,
-                          List<Screener> screeners, String buildingId, Status status, LocalDateTime dueDate, RiskLevel riskLevel,
-                          List<String> siteMaintenanceAssociateIds) {
+    public BuildingRiskAssessment(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail,
+                                  String publisherId, Long workOrder, String title, String taskDescription, List<BuildingProfile> buildingProfile,
+                                  List<Hazard> hazards, List<Screener> screeners, List<String> assignedAssociatesIds, String siteId, Status status) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -41,13 +38,12 @@ public class RiskAssessment implements Entity {
         this.workOrder = workOrder;
         this.title = title;
         this.taskDescription = taskDescription;
+        this.buildingProfile = buildingProfile;
         this.hazards = hazards;
         this.screeners = screeners;
-        this.buildingId = buildingId;
+        this.assignedAssociatesIds = assignedAssociatesIds;
+        this.siteId = siteId;
         this.status = status;
-        this.dueDate = dueDate;
-        this.riskLevel = riskLevel;
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
     }
 
     @Override
@@ -56,28 +52,13 @@ public class RiskAssessment implements Entity {
     }
 
     @Override
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    @Override
-    public List<EntityTrail> getEntityTrail() {
-        return entityTrail;
-    }
-
-    @Override
-    public String getPublisherId() {
-        return publisherId;
-    }
-
-    @Override
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     @Override
@@ -86,13 +67,28 @@ public class RiskAssessment implements Entity {
     }
 
     @Override
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @Override
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
     @Override
+    public List<EntityTrail> getEntityTrail() {
+        return entityTrail;
+    }
+
+    @Override
     public void setEntityTrail(List<EntityTrail> entityTrail) {
         this.entityTrail = entityTrail;
+    }
+
+    @Override
+    public String getPublisherId() {
+        return publisherId;
     }
 
     @Override
@@ -124,6 +120,14 @@ public class RiskAssessment implements Entity {
         this.taskDescription = taskDescription;
     }
 
+    public List<BuildingProfile> getBuildingProfile() {
+        return buildingProfile;
+    }
+
+    public void setBuildingProfile(List<BuildingProfile> buildingProfile) {
+        this.buildingProfile = buildingProfile;
+    }
+
     public List<Hazard> getHazards() {
         return hazards;
     }
@@ -140,12 +144,20 @@ public class RiskAssessment implements Entity {
         this.screeners = screeners;
     }
 
-    public String getBuildingId() {
-        return buildingId;
+    public List<String> getAssignedAssociatesIds() {
+        return assignedAssociatesIds;
     }
 
-    public void setBuildingId(String buildingId) {
-        this.buildingId = buildingId;
+    public void setAssignedAssociatesIds(List<String> assignedAssociatesIds) {
+        this.assignedAssociatesIds = assignedAssociatesIds;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 
     public Status getStatus() {
@@ -156,35 +168,11 @@ public class RiskAssessment implements Entity {
         this.status = status;
     }
 
-    public LocalDateTime getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDateTime dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public RiskLevel getRiskLevel() {
-        return riskLevel;
-    }
-
-    public void setRiskLevel(RiskLevel riskLevel) {
-        this.riskLevel = riskLevel;
-    }
-
-    public List<String> getSiteMaintenanceAssociateIds() {
-        return siteMaintenanceAssociateIds;
-    }
-
-    public void setSiteMaintenanceAssociateIds(List<String> siteMaintenanceAssociateIds) {
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RiskAssessment that = (RiskAssessment) o;
+        BuildingRiskAssessment that = (BuildingRiskAssessment) o;
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getCreatedAt(), that.getCreatedAt()) &&
                 Objects.equals(getUpdatedAt(), that.getUpdatedAt()) &&
@@ -193,23 +181,24 @@ public class RiskAssessment implements Entity {
                 Objects.equals(getWorkOrder(), that.getWorkOrder()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
+                Objects.equals(getBuildingProfile(), that.getBuildingProfile()) &&
                 Objects.equals(getHazards(), that.getHazards()) &&
                 Objects.equals(getScreeners(), that.getScreeners()) &&
-                Objects.equals(getBuildingId(), that.getBuildingId()) &&
-                getStatus() == that.getStatus() &&
-                Objects.equals(getDueDate(), that.getDueDate()) &&
-                getRiskLevel() == that.getRiskLevel() &&
-                Objects.equals(getSiteMaintenanceAssociateIds(), that.getSiteMaintenanceAssociateIds());
+                Objects.equals(getAssignedAssociatesIds(), that.getAssignedAssociatesIds()) &&
+                Objects.equals(getSiteId(), that.getSiteId()) &&
+                getStatus() == that.getStatus();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getBuildingId(), getStatus(), getDueDate(), getRiskLevel(), getSiteMaintenanceAssociateIds());
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getWorkOrder(),
+                getTitle(), getTaskDescription(), getBuildingProfile(), getHazards(), getScreeners(), getAssignedAssociatesIds(),
+                getSiteId(), getStatus());
     }
 
     @Override
     public String toString() {
-        return "RiskAssessment{" +
+        return "BuildingRiskAssessment{" +
                 "id='" + id + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
@@ -218,13 +207,12 @@ public class RiskAssessment implements Entity {
                 ", workOrder=" + workOrder +
                 ", title='" + title + '\'' +
                 ", taskDescription='" + taskDescription + '\'' +
+                ", buildingProfile=" + buildingProfile +
                 ", hazards=" + hazards +
                 ", screeners=" + screeners +
-                ", buildingId='" + buildingId + '\'' +
+                ", assignedAssociatesIds=" + assignedAssociatesIds +
+                ", siteId='" + siteId + '\'' +
                 ", status=" + status +
-                ", dueDate=" + dueDate +
-                ", riskLevel=" + riskLevel +
-                ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 '}';
     }
 }

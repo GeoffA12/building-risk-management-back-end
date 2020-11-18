@@ -16,12 +16,11 @@ public class UpdateRiskAssessmentInput {
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
-    private List<String> siteIds;
 
     @JsonCreator
     public UpdateRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId, @JsonProperty Long workOrder,
                                      @JsonProperty String title, @JsonProperty String taskDescription, @JsonProperty List<Hazard> hazards,
-                                     @JsonProperty List<Screener> screeners, @JsonProperty List<String> siteIds) {
+                                     @JsonProperty List<Screener> screeners) {
         this.id = id;
         this.publisherId = publisherId;
         this.workOrder = workOrder;
@@ -29,7 +28,6 @@ public class UpdateRiskAssessmentInput {
         this.taskDescription = taskDescription;
         this.hazards = hazards;
         this.screeners = screeners;
-        this.siteIds = siteIds;
     }
 
     public String getId() {
@@ -88,14 +86,6 @@ public class UpdateRiskAssessmentInput {
         this.screeners = screeners;
     }
 
-    public List<String> getSiteIds() {
-        return siteIds;
-    }
-
-    public void setSiteIds(List<String> siteIds) {
-        this.siteIds = siteIds;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,13 +97,12 @@ public class UpdateRiskAssessmentInput {
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
                 Objects.equals(getHazards(), that.getHazards()) &&
-                Objects.equals(getScreeners(), that.getScreeners()) &&
-                Objects.equals(getSiteIds(), that.getSiteIds());
+                Objects.equals(getScreeners(), that.getScreeners());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getSiteIds());
+        return Objects.hash(getId(), getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
     }
 
     @Override
@@ -126,7 +115,6 @@ public class UpdateRiskAssessmentInput {
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +
                 ", screeners=" + screeners +
-                ", siteIds=" + siteIds +
                 '}';
     }
 }

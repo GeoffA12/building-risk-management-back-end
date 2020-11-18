@@ -1,6 +1,8 @@
 package com.cosc436002fitzarr.brm.services;
 
 
+import com.cosc436002fitzarr.brm.enums.RiskLevel;
+import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
@@ -31,6 +33,8 @@ public class RiskAssessmentService {
     @Autowired
     public WorkplaceHealthSafetyMemberService workplaceHealthSafetyMemberService;
 
+    private static final Long DEFAULT_WORK_ORDER = 0L;
+
     private static Logger LOGGER = LoggerFactory.getLogger(RiskAssessmentService.class);
 
     public RiskAssessment createRiskAssessment(CreateRiskAssessmentInput input) {
@@ -38,7 +42,7 @@ public class RiskAssessmentService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
         List<EntityTrail> entityTrail = new ArrayList<>();
         entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedRiskAssessmentMessage()));
-        List<String> siteIds = new ArrayList<>();
+        List<String> siteMaintenanceAssociateIds = new ArrayList<>();
 
         RiskAssessment riskAssessmentForPersistence = new RiskAssessment(
             id,
@@ -46,12 +50,16 @@ public class RiskAssessmentService {
             currentTime,
             entityTrail,
             input.getPublisherId(),
-            input.getWorkOrder(),
+            DEFAULT_WORK_ORDER,
             input.getTitle(),
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            siteIds
+            null,
+            Status.NOT_ASSIGNED,
+            null,
+            RiskLevel.EMPTY,
+            siteMaintenanceAssociateIds
         );
 
         try {
@@ -79,12 +87,16 @@ public class RiskAssessmentService {
             currentTime,
             updatedRiskAssessment.getEntityTrail(),
             input.getPublisherId(),
-            input.getWorkOrder(),
+            updatedRiskAssessment.getWorkOrder(),
             input.getTitle(),
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            input.getSiteIds()
+            updatedRiskAssessment.getBuildingId(),
+            updatedRiskAssessment.getStatus(),
+            updatedRiskAssessment.getDueDate(),
+            updatedRiskAssessment.getRiskLevel(),
+            updatedRiskAssessment.getSiteMaintenanceAssociateIds()
         );
 
         try {

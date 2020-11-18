@@ -10,18 +10,16 @@ import java.util.Objects;
 
 public class CreateRiskAssessmentInput {
     private String publisherId;
-    private Long workOrder;
     private String title;
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
 
     @JsonCreator
-    public CreateRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty Long workOrder, @JsonProperty String title,
+    public CreateRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty String title,
                                      @JsonProperty String taskDescription, @JsonProperty List<Hazard> hazards,
                                      @JsonProperty List<Screener> screeners) {
         this.publisherId = publisherId;
-        this.workOrder = workOrder;
         this.title = title;
         this.taskDescription = taskDescription;
         this.hazards = hazards;
@@ -34,14 +32,6 @@ public class CreateRiskAssessmentInput {
 
     public void setPublisherId(String publisherId) {
         this.publisherId = publisherId;
-    }
-
-    public Long getWorkOrder() {
-        return workOrder;
-    }
-
-    public void setWorkOrder(Long workOrder) {
-        this.workOrder = workOrder;
     }
 
     public String getTitle() {
@@ -82,7 +72,6 @@ public class CreateRiskAssessmentInput {
         if (o == null || getClass() != o.getClass()) return false;
         CreateRiskAssessmentInput that = (CreateRiskAssessmentInput) o;
         return Objects.equals(getPublisherId(), that.getPublisherId()) &&
-                Objects.equals(getWorkOrder(), that.getWorkOrder()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
                 Objects.equals(getHazards(), that.getHazards()) &&
@@ -91,14 +80,13 @@ public class CreateRiskAssessmentInput {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
+        return Objects.hash(getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
     }
 
     @Override
     public String toString() {
         return "CreateRiskAssessmentInput{" +
                 "publisherId='" + publisherId + '\'' +
-                ", workOrder=" + workOrder +
                 ", title='" + title + '\'' +
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +

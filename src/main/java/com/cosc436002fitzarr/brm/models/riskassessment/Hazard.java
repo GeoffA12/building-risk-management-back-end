@@ -9,12 +9,16 @@ public class Hazard {
     private RiskImpact riskImpact;
     private String directions;
     private RiskCategory riskCategory;
+    private String comments;
+    private Boolean didFulfillHazard;
 
-    public Hazard(String description, RiskImpact riskImpact, String directions, RiskCategory riskCategory) {
+    public Hazard(String description, RiskImpact riskImpact, String directions, RiskCategory riskCategory, String comments, Boolean didFulfillHazard) {
         this.description = description;
         this.riskImpact = riskImpact;
         this.directions = directions;
         this.riskCategory = riskCategory;
+        this.comments = comments;
+        this.didFulfillHazard = didFulfillHazard;
     }
 
     public String getDescription() {
@@ -49,20 +53,38 @@ public class Hazard {
         this.riskCategory = riskCategory;
     }
 
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public Boolean getDidFulfillHazard() {
+        return didFulfillHazard;
+    }
+
+    public void setDidFulfillHazard(Boolean didFulfillHazard) {
+        this.didFulfillHazard = didFulfillHazard;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Hazard hazard = (Hazard) o;
-        return getDescription().equals(hazard.getDescription()) &&
+        return Objects.equals(getDescription(), hazard.getDescription()) &&
                 getRiskImpact() == hazard.getRiskImpact() &&
-                getDirections().equals(hazard.getDirections()) &&
-                getRiskCategory() == hazard.getRiskCategory();
+                Objects.equals(getDirections(), hazard.getDirections()) &&
+                getRiskCategory() == hazard.getRiskCategory() &&
+                Objects.equals(getComments(), hazard.getComments()) &&
+                Objects.equals(getDidFulfillHazard(), hazard.getDidFulfillHazard());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getDescription(), getRiskImpact(), getDirections(), getRiskCategory());
+        return Objects.hash(getDescription(), getRiskImpact(), getDirections(), getRiskCategory(), getComments(), getDidFulfillHazard());
     }
 
     @Override
@@ -72,6 +94,8 @@ public class Hazard {
                 ", riskImpact=" + riskImpact +
                 ", directions='" + directions + '\'' +
                 ", riskCategory=" + riskCategory +
+                ", comments='" + comments + '\'' +
+                ", didFulfillHazard=" + didFulfillHazard +
                 '}';
     }
 }

@@ -87,7 +87,7 @@ public class RiskAssessmentService {
             currentTime,
             updatedRiskAssessment.getEntityTrail(),
             input.getPublisherId(),
-            input.getWorkOrder(),
+            updatedRiskAssessment.getWorkOrder(),
             input.getTitle(),
             input.getTaskDescription(),
             input.getHazards(),

@@ -11,19 +11,17 @@ import java.util.Objects;
 public class UpdateRiskAssessmentInput {
     private String id;
     private String publisherId;
-    private Long workOrder;
     private String title;
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
 
     @JsonCreator
-    public UpdateRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId, @JsonProperty Long workOrder,
-                                     @JsonProperty String title, @JsonProperty String taskDescription, @JsonProperty List<Hazard> hazards,
-                                     @JsonProperty List<Screener> screeners) {
+    public UpdateRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId,
+                                     @JsonProperty String title, @JsonProperty String taskDescription,
+                                     @JsonProperty List<Hazard> hazards, @JsonProperty List<Screener> screeners) {
         this.id = id;
         this.publisherId = publisherId;
-        this.workOrder = workOrder;
         this.title = title;
         this.taskDescription = taskDescription;
         this.hazards = hazards;
@@ -44,14 +42,6 @@ public class UpdateRiskAssessmentInput {
 
     public void setPublisherId(String publisherId) {
         this.publisherId = publisherId;
-    }
-
-    public Long getWorkOrder() {
-        return workOrder;
-    }
-
-    public void setWorkOrder(Long workOrder) {
-        this.workOrder = workOrder;
     }
 
     public String getTitle() {
@@ -93,7 +83,6 @@ public class UpdateRiskAssessmentInput {
         UpdateRiskAssessmentInput that = (UpdateRiskAssessmentInput) o;
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getPublisherId(), that.getPublisherId()) &&
-                Objects.equals(getWorkOrder(), that.getWorkOrder()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
                 Objects.equals(getHazards(), that.getHazards()) &&
@@ -102,7 +91,7 @@ public class UpdateRiskAssessmentInput {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPublisherId(), getWorkOrder(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
+        return Objects.hash(getId(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
     }
 
     @Override
@@ -110,7 +99,6 @@ public class UpdateRiskAssessmentInput {
         return "UpdateRiskAssessmentInput{" +
                 "id='" + id + '\'' +
                 ", publisherId='" + publisherId + '\'' +
-                ", workOrder=" + workOrder +
                 ", title='" + title + '\'' +
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +

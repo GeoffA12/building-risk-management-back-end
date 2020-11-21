@@ -1,14 +1,16 @@
 package com.cosc436002fitzarr.brm.services;
 
-
 import com.cosc436002fitzarr.brm.enums.RiskLevel;
 import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.buildingriskassessments.BuildingRiskAssessments;
+import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.CreateBuildingRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.GetAllRiskAssessmentsBySiteInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.UpdateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.workplacehealthsafetymember.WorkplaceHealthSafetyMember;
+import com.cosc436002fitzarr.brm.repositories.BuildingRiskAssessmentsRepository;
 import com.cosc436002fitzarr.brm.repositories.RiskAssessmentRepository;
 import com.cosc436002fitzarr.brm.utils.PageUtils;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,50 +30,38 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class RiskAssessmentService {
+public class BuildingRiskAssessmentsService {
     @Autowired
-    public RiskAssessmentRepository riskAssessmentRepository;
-    @Autowired
-    public WorkplaceHealthSafetyMemberService workplaceHealthSafetyMemberService;
+    public BuildingRiskAssessmentsRepository buildingRiskAssessmentsRepository;
 
-    private static final Long DEFAULT_WORK_ORDER = 0L;
+    private static Logger LOGGER = LoggerFactory.getLogger(BuildingRiskAssessmentsService.class);
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RiskAssessmentService.class);
-
-    public RiskAssessment createRiskAssessment(CreateRiskAssessmentInput input) {
+    public BuildingRiskAssessments createBuildingRiskAssessments(CreateBuildingRiskAssessmentsInput input) {
         String id = UUID.randomUUID().toString();
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
         List<EntityTrail> entityTrail = new ArrayList<>();
-        entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedRiskAssessmentMessage()));
-        List<String> siteMaintenanceAssociateIds = new ArrayList<>();
+        entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedBuildingRiskAssessmentsMessage()));
 
-        RiskAssessment riskAssessmentForPersistence = new RiskAssessment(
-            id,
-            currentTime,
-            currentTime,
-            entityTrail,
-            input.getPublisherId(),
-            DEFAULT_WORK_ORDER,
-            input.getTitle(),
-            input.getTaskDescription(),
-            input.getHazards(),
-            input.getScreeners(),
-            null,
-            Status.NOT_ASSIGNED,
-            null,
-            RiskLevel.EMPTY,
-            siteMaintenanceAssociateIds
+        BuildingRiskAssessments buildingRiskAssessmentForPersistence = new BuildingRiskAssessments(
+                id,
+                currentTime,
+                currentTime,
+                entityTrail,
+                input.getPublisherId(),
+                input.getRiskAssessmentIds(),
+                input.getBuildingId(),
+                input.getTitle(),
+                input.getDescription()
         );
 
         try {
-            riskAssessmentRepository.save(riskAssessmentForPersistence);
-            LOGGER.info("Persisted new risk assessment: " + riskAssessmentForPersistence.toString() + " to the risk assessment repository");
+            buildingRiskAssessmentsRepository.save(buildingRiskAssessmentForPersistence);
+            LOGGER.info("Persisted new building risk assessment: " + buildingRiskAssessmentForPersistence.toString() + " to the building risk assessments repository");
         } catch(Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException();
         }
-        workplaceHealthSafetyMemberService.attachRiskAssessmentIdToWorkplaceHealthSafetyMemberIdList(id, input.getPublisherId());
-        return riskAssessmentForPersistence;
+        return buildingRiskAssessmentForPersistence;
     }
 
     public RiskAssessment updateRiskAssessment(UpdateRiskAssessmentInput input) {
@@ -79,21 +70,21 @@ public class RiskAssessmentService {
         RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(input.getId(), input.getPublisherId());
 
         RiskAssessment updatedRiskAssessmentForPersistence = new RiskAssessment(
-            updatedRiskAssessment.getId(),
-            updatedRiskAssessment.getCreatedAt(),
-            currentTime,
-            updatedRiskAssessment.getEntityTrail(),
-            input.getPublisherId(),
-            updatedRiskAssessment.getWorkOrder(),
-            input.getTitle(),
-            input.getTaskDescription(),
-            input.getHazards(),
-            input.getScreeners(),
-            updatedRiskAssessment.getBuildingId(),
-            updatedRiskAssessment.getStatus(),
-            updatedRiskAssessment.getDueDate(),
-            updatedRiskAssessment.getRiskLevel(),
-            updatedRiskAssessment.getSiteMaintenanceAssociateIds()
+                updatedRiskAssessment.getId(),
+                updatedRiskAssessment.getCreatedAt(),
+                currentTime,
+                updatedRiskAssessment.getEntityTrail(),
+                input.getPublisherId(),
+                updatedRiskAssessment.getWorkOrder(),
+                input.getTitle(),
+                input.getTaskDescription(),
+                input.getHazards(),
+                input.getScreeners(),
+                updatedRiskAssessment.getBuildingId(),
+                updatedRiskAssessment.getStatus(),
+                updatedRiskAssessment.getDueDate(),
+                updatedRiskAssessment.getRiskLevel(),
+                updatedRiskAssessment.getSiteMaintenanceAssociateIds()
         );
 
         try {
@@ -145,30 +136,27 @@ public class RiskAssessmentService {
         }
     }
 
-    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input){
+    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input) {
+        Sort sortProperty = Sort.by(input.getPageInput().getSortDirection(), input.getPageInput().getSortBy());
+        Pageable pageInput = PageRequest.of(input.getPageInput().getPageNo().intValue(), input.getPageInput().getPageSize().intValue(), sortProperty);
 
+        Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
+        List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
+
+        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getAssociatedSiteIds());
+        List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
+        for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
+            whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());
+        }
+
+        List<RiskAssessment> filteredRiskAssessmentContent = riskAssessmentContent
+                .stream()
+                .filter(riskAssessment -> whsMemberSubmittedRiskAssessmentIds.contains(riskAssessment.getId()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> riskAssessmentMapResponse = PageUtils.getRiskAssessmentMappingResponse(sortedRiskAssessmentsInPage, filteredRiskAssessmentContent);
+        return riskAssessmentMapResponse;
     }
-//    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input) {
-//        Sort sortProperty = Sort.by(input.getPageInput().getSortDirection(), input.getPageInput().getSortBy());
-//        Pageable pageInput = PageRequest.of(input.getPageInput().getPageNo().intValue(), input.getPageInput().getPageSize().intValue(), sortProperty);
-//
-//        Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
-//        List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
-//
-//        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getAssociatedSiteIds());
-//        List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
-//        for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
-//            whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());
-//        }
-//
-//        List<RiskAssessment> filteredRiskAssessmentContent = riskAssessmentContent
-//                .stream()
-//                .filter(riskAssessment -> whsMemberSubmittedRiskAssessmentIds.contains(riskAssessment.getId()))
-//                .collect(Collectors.toList());
-//
-//        Map<String, Object> riskAssessmentMapResponse = PageUtils.getRiskAssessmentMappingResponse(sortedRiskAssessmentsInPage, filteredRiskAssessmentContent);
-//        return riskAssessmentMapResponse;
-//    }
 
     public RiskAssessment deleteRiskAssessment(String id, String publisherId) {
         Optional<RiskAssessment> potentialRiskAssessment = riskAssessmentRepository.findById(id);
@@ -186,11 +174,11 @@ public class RiskAssessmentService {
         }
     }
 
-    public String getCreatedRiskAssessmentMessage() {
-        return "CREATED RISK ASSESSMENT";
+    public String getCreatedBuildingRiskAssessmentsMessage() {
+            return "CREATED BUILDING RISK ASSESSMENT";
     }
 
-    public String getUpdatedRiskAssessmentMessage() {
-        return "UPDATED RISK ASSESSMENT";
+    public String getUpdatedBuildingRiskAssessmentsMessage() {
+        return "UPDATED BUILDING RISK ASSESSMENT";
     }
 }

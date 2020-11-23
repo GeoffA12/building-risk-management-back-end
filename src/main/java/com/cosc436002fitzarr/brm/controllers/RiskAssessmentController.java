@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,7 +44,8 @@ public class RiskAssessmentController {
     }
 
     @PostMapping(value = "/getRiskAssessmentsBySite")
-    public List<RiskAssessment> getRiskAssessmentsBySite(@RequestParam(name="associatedSiteIds") List<String> associatedSiteIds) {
-        return riskAssessmentService.getRiskAssessmentsBySite(associatedSiteIds);
+    public Map<String, Object> getRiskAssessmentsBySite(@RequestBody GetAllRiskAssessmentsBySiteInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return riskAssessmentService.getRiskAssessmentsBySite(requestBody);
     }
 }

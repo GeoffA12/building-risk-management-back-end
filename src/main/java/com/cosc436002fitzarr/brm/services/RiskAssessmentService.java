@@ -145,30 +145,27 @@ public class RiskAssessmentService {
         }
     }
 
-    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input){
+    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input) {
+        Sort sortProperty = Sort.by(input.getPageInput().getSortDirection(), input.getPageInput().getSortBy());
+        Pageable pageInput = PageRequest.of(input.getPageInput().getPageNo().intValue(), input.getPageInput().getPageSize().intValue(), sortProperty);
 
+        Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
+        List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
+
+        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersBySite(input.getAssociatedSiteIds());
+        List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
+        for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
+            whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());
+        }
+
+        List<RiskAssessment> filteredRiskAssessmentContent = riskAssessmentContent
+                .stream()
+                .filter(riskAssessment -> whsMemberSubmittedRiskAssessmentIds.contains(riskAssessment.getId()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> riskAssessmentMapResponse = PageUtils.getRiskAssessmentMappingResponse(sortedRiskAssessmentsInPage, filteredRiskAssessmentContent);
+        return riskAssessmentMapResponse;
     }
-//    public Map<String, Object> getRiskAssessmentsBySite(GetAllRiskAssessmentsBySiteInput input) {
-//        Sort sortProperty = Sort.by(input.getPageInput().getSortDirection(), input.getPageInput().getSortBy());
-//        Pageable pageInput = PageRequest.of(input.getPageInput().getPageNo().intValue(), input.getPageInput().getPageSize().intValue(), sortProperty);
-//
-//        Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
-//        List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
-//
-//        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getAssociatedSiteIds());
-//        List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
-//        for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
-//            whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());
-//        }
-//
-//        List<RiskAssessment> filteredRiskAssessmentContent = riskAssessmentContent
-//                .stream()
-//                .filter(riskAssessment -> whsMemberSubmittedRiskAssessmentIds.contains(riskAssessment.getId()))
-//                .collect(Collectors.toList());
-//
-//        Map<String, Object> riskAssessmentMapResponse = PageUtils.getRiskAssessmentMappingResponse(sortedRiskAssessmentsInPage, filteredRiskAssessmentContent);
-//        return riskAssessmentMapResponse;
-//    }
 
     public RiskAssessment deleteRiskAssessment(String id, String publisherId) {
         Optional<RiskAssessment> potentialRiskAssessment = riskAssessmentRepository.findById(id);

@@ -266,8 +266,8 @@ public class WorkplaceHealthSafetyMemberService {
         }
     }
 
-    public List<WorkplaceHealthSafetyMember> getWorkplaceHealthSafetyMembersByUserIdAndSite(List<String> associatedSiteIds) {
-        return workplaceHealthSafetyMemberRepository.getWorkplaceHealthSafetyMembersByUserIdAndSite(associatedSiteIds);
+    public List<WorkplaceHealthSafetyMember> getWorkplaceHealthSafetyMembersBySite(List<String> associatedSiteIds) {
+        return workplaceHealthSafetyMemberRepository.getWorkplaceHealthSafetyMembersBySite(associatedSiteIds);
     }
 
     public String getCreatedWorkplaceHealthSafetyMemberSystemComment() {

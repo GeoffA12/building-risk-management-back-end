@@ -3,17 +3,21 @@ package com.cosc436002fitzarr.brm.services;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.building.Building;
 import com.cosc436002fitzarr.brm.models.building.input.CreateBuildingInput;
+import com.cosc436002fitzarr.brm.models.building.input.GetAllBuildingsBySiteInput;
 import com.cosc436002fitzarr.brm.models.building.input.UpdateBuildingInput;
 import com.cosc436002fitzarr.brm.repositories.BuildingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
+@Service
 public class BuildingService {
     @Autowired
     public BuildingRepository buildingRepository;
@@ -117,6 +121,18 @@ public class BuildingService {
         }
     }
 
+    public List<Building> getAllBuildingsBySite(GetAllBuildingsBySiteInput input) {
+        List<Building> matchingBuildingsBySiteId;
+        try {
+            matchingBuildingsBySiteId = buildingRepository.findBuildingsBySiteId(input.getSiteId());
+            LOGGER.info("Retrieved buildings from building repository: " + matchingBuildingsBySiteId.toString());
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+        return matchingBuildingsBySiteId;
+    }
+
     public Building deleteBuilding(String id) {
         Optional<Building> potentialBuilding = buildingRepository.findById(id);
         Boolean buildingIsPresent = potentialBuilding.isPresent();
@@ -133,10 +149,10 @@ public class BuildingService {
     }
 
     public String getCreatedBuildingMessage() {
-        return "CREATED BUILDING ASSESSMENT";
+        return "CREATED BUILDING";
     }
 
     public String getUpdatedBuildingMessage() {
-        return "UPDATED BUILDING ASSESSMENT";
+        return "UPDATED BUILDING";
     }
 }

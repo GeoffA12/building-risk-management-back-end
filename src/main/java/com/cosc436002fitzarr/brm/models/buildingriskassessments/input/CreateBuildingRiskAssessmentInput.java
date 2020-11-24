@@ -5,21 +5,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateBuildingRiskAssessmentsInput {
+public class CreateBuildingRiskAssessmentInput {
     private String publisherId;
     private List<String> riskAssessmentIds;
+    private List<String> siteMaintenanceAssociateIds;
     private String buildingId;
     private String title;
     private String description;
+    private Long workOrder;
 
     @JsonCreator
-    public CreateBuildingRiskAssessmentsInput(@JsonProperty String publisherId, @JsonProperty List<String> riskAssessmentIds,
-                                              @JsonProperty String buildingId, @JsonProperty String title, @JsonProperty String description) {
+    public CreateBuildingRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty List<String> riskAssessmentIds,
+                                             @JsonProperty List<String> siteMaintenanceAssociateIds, @JsonProperty String buildingId,
+                                             @JsonProperty String title, @JsonProperty String description, @JsonProperty Long workOrder) {
         this.publisherId = publisherId;
         this.riskAssessmentIds = riskAssessmentIds;
+        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
         this.buildingId = buildingId;
         this.title = title;
         this.description = description;
+        this.workOrder = workOrder;
     }
 
     public String getPublisherId() {
@@ -62,21 +67,39 @@ public class CreateBuildingRiskAssessmentsInput {
         this.description = description;
     }
 
+    public List<String> getSiteMaintenanceAssociateIds() {
+        return siteMaintenanceAssociateIds;
+    }
+
+    public void setSiteMaintenanceAssociateIds(List<String> siteMaintenanceAssociateIds) {
+        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
+    }
+
+    public Long getWorkOrder() {
+        return workOrder;
+    }
+
+    public void setWorkOrder(Long workOrder) {
+        this.workOrder = workOrder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CreateBuildingRiskAssessmentsInput that = (CreateBuildingRiskAssessmentsInput) o;
-        return Objects.equals(getPublisherId(), that.getPublisherId()) &&
-                Objects.equals(getRiskAssessmentIds(), that.getRiskAssessmentIds()) &&
-                Objects.equals(getBuildingId(), that.getBuildingId()) &&
-                Objects.equals(getTitle(), that.getTitle()) &&
-                Objects.equals(getDescription(), that.getDescription());
+        CreateBuildingRiskAssessmentInput that = (CreateBuildingRiskAssessmentInput) o;
+        return getPublisherId().equals(that.getPublisherId()) &&
+                getRiskAssessmentIds().equals(that.getRiskAssessmentIds()) &&
+                getSiteMaintenanceAssociateIds().equals(that.getSiteMaintenanceAssociateIds()) &&
+                getBuildingId().equals(that.getBuildingId()) &&
+                getTitle().equals(that.getTitle()) &&
+                getDescription().equals(that.getDescription()) &&
+                getWorkOrder().equals(that.getWorkOrder());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisherId(), getRiskAssessmentIds(), getBuildingId(), getTitle(), getDescription());
+        return Objects.hash(getPublisherId(), getRiskAssessmentIds(), getSiteMaintenanceAssociateIds(), getBuildingId(), getTitle(), getDescription(), getWorkOrder());
     }
 
     @Override
@@ -84,9 +107,11 @@ public class CreateBuildingRiskAssessmentsInput {
         return "CreateBuildingRiskAssessmentsInput{" +
                 "publisherId='" + publisherId + '\'' +
                 ", riskAssessmentIds=" + riskAssessmentIds +
+                ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 ", buildingId='" + buildingId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
+                ", workOrder=" + workOrder +
                 '}';
     }
 }

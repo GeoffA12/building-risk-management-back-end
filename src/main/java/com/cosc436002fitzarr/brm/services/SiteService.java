@@ -1,7 +1,6 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
-import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.models.site.input.*;
 import com.cosc436002fitzarr.brm.models.siteadmin.SiteAdmin;
@@ -169,14 +168,13 @@ public class SiteService {
         return existingSite;
     }
 
-    public Site deleteSite(ReferenceInput requestBody) {
-        String existingSiteId = requestBody.getId();
+    public Site deleteSite(String id) {
         Site deletedSite;
         try {
-            deletedSite = siteRepository.getById(existingSiteId);
-            siteRepository.deleteById(existingSiteId);
+            deletedSite = siteRepository.getById(id);
+            siteRepository.deleteById(id);
         } catch (Exception e) {
-            LOGGER.info("Entity with id: " + existingSiteId + " not found in repository");
+            LOGGER.info("Entity with id: " + id + " not found in repository");
             throw new RuntimeException(e);
         }
         return deletedSite;

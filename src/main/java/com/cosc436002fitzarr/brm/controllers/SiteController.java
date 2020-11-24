@@ -1,6 +1,5 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.ReferenceInput;
 import com.cosc436002fitzarr.brm.models.site.input.*;
 import com.cosc436002fitzarr.brm.models.site.Site;
 import com.cosc436002fitzarr.brm.services.SiteService;
@@ -27,10 +26,9 @@ public class SiteController {
 
     // If we wanted the id as a URL parameter, the URL could be "/{id}". However, the id would need to be a @RequestParam as well. This is usually done when we're only
     // dealing with single objects
-    @PostMapping(value = "/getSiteById", consumes = "application/json", produces = "application/json")
-    public Site getById(@RequestBody ReferenceInput requestBody) {
-        LOGGER.info(requestBody.toString());
-        return siteService.getById(requestBody.getId());
+    @RequestMapping(value = "/getSiteById")
+    public Site getById(@RequestParam(name = "id") String id) {
+        return siteService.getById(id);
     }
 
     @PostMapping(value = "/getSitesByName", consumes = "application/json", produces = "application/json")
@@ -63,9 +61,9 @@ public class SiteController {
     }
 
     @DeleteMapping(value = "/deleteSite")
-    public String deleteSite(@RequestBody ReferenceInput requestBody) {
-        LOGGER.info(requestBody.toString());
-        return "Site: " + siteService.deleteSite(requestBody).toString() + "deleted from the repository.";
+    public String deleteSite(@RequestParam(name = "id") String id) {
+        siteService.deleteSite(id);
+        return "Site with id: " + id + "deleted from the repository.";
     }
 
 

@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface WorkplaceHealthSafetyMemberRepository extends MongoRepository<WorkplaceHealthSafetyMember, String> {
-    @Query(value = "{ $and: 'associatedSiteIds': { $in: ?0 } }")
+    @Query(value = "{ 'associatedSiteIds': { $in: ?0 } }")
     public List<WorkplaceHealthSafetyMember> getWorkplaceHealthSafetyMembersBySite(List<String> associatedSiteIds);
 }

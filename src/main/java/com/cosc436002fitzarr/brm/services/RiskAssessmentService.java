@@ -168,19 +168,45 @@ public class RiskAssessmentService {
     }
 
     public RiskAssessment deleteRiskAssessment(String id, String publisherId) {
+        RiskAssessment assessmentToDelete = checkRiskAssessmentExists(id);
+        riskAssessmentRepository.deleteById(id);
+        LOGGER.info("Risk assessment: " + assessmentToDelete.toString() + " successfully fetched and deleted from risk assessment repository");
+        workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(assessmentToDelete.getId(), publisherId);
+        return assessmentToDelete;
+    }
+
+    public void attachBuildingRiskAssessmentAttributesToRiskAssessments(List<String> existingRiskAssessmentId, Long workOrder, String buildingId, String publisherId) {
+        for (String riskAssessmentId : existingRiskAssessmentId) {
+            RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
+
+            RiskAssessment updatedAssessmentForPersistence = getUpdatedRiskAssessment(riskAssessmentToAttachNewBuildingRiskAssessment.getId(), publisherId);
+
+            // TODO: Continue adding setters once due date and risk level are integrated with the building risk assessment input
+            updatedAssessmentForPersistence.setWorkOrder(workOrder);
+
+            updatedAssessmentForPersistence.setBuildingId(buildingId);
+
+            try {
+                riskAssessmentRepository.save(updatedAssessmentForPersistence);
+                LOGGER.info("Risk assessment with id: " + updatedAssessmentForPersistence.toString() + " updated in " +
+                        "risk assessment repository");
+            } catch (Exception e) {
+                LOGGER.info(e.toString());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public RiskAssessment checkRiskAssessmentExists(String id) {
         Optional<RiskAssessment> potentialRiskAssessment = riskAssessmentRepository.findById(id);
-        Boolean riskAssessmentIsPresent = potentialRiskAssessment.isPresent();
-        if (!riskAssessmentIsPresent) {
+        Boolean riskAssessmentPresent = potentialRiskAssessment.isPresent();
+        if (!riskAssessmentPresent) {
             LOGGER.info("Risk assessment with id: " + id + " not found in the risk assessment repository!");
             throw new EntityNotFoundException("Risk assessment with id: " + id + " not found in the risk assessment repository!");
         }
-        else {
-            riskAssessmentRepository.deleteById(id);
-            LOGGER.info("Risk assessment: " + potentialRiskAssessment.get().toString() + " successfully fetched and deleted from risk assessment repository");
-            RiskAssessment deletedRiskAssessment = potentialRiskAssessment.get();
-            workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(id, publisherId);
-            return deletedRiskAssessment;
-        }
+        LOGGER.info("Risk assessment: " + potentialRiskAssessment.get().toString() + " successfully fetched and deleted from risk assessment repository");
+        RiskAssessment existingRiskAssessment = potentialRiskAssessment.get();
+        return existingRiskAssessment;
     }
 
     public String getCreatedRiskAssessmentMessage() {

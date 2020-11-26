@@ -1,9 +1,9 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.building.Building;
 import com.cosc436002fitzarr.brm.models.building.input.CreateBuildingInput;
-import com.cosc436002fitzarr.brm.models.building.input.GetAllBuildingsBySiteInput;
 import com.cosc436002fitzarr.brm.models.building.input.UpdateBuildingInput;
 import com.cosc436002fitzarr.brm.repositories.BuildingRepository;
 import org.slf4j.Logger;
@@ -121,14 +121,12 @@ public class BuildingService {
         }
     }
 
-    public List<Building> getAllBuildingsBySite(GetAllBuildingsBySiteInput input) {
-        List<Building> matchingBuildingsBySiteId;
-        try {
-            matchingBuildingsBySiteId = buildingRepository.findBuildingsBySiteId(input.getSiteId());
-            LOGGER.info("Retrieved buildings from building repository: " + matchingBuildingsBySiteId.toString());
-        } catch (Exception e) {
-            LOGGER.info(e.toString());
-            throw new RuntimeException(e);
+    public List<Building> getAllBuildingsBySite(GetEntityBySiteInput input) {
+        List<String> allSiteIds = input.getAssociatedSiteIds();
+        List<Building> matchingBuildingsBySiteId = new ArrayList<>();
+
+        for (String siteId : allSiteIds) {
+            matchingBuildingsBySiteId.addAll(buildingRepository.findBuildingsBySiteId(siteId));
         }
         return matchingBuildingsBySiteId;
     }

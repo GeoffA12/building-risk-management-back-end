@@ -1,18 +1,15 @@
 package com.cosc436002fitzarr.brm.controllers;
 
+import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.building.Building;
 import com.cosc436002fitzarr.brm.models.building.input.CreateBuildingInput;
-import com.cosc436002fitzarr.brm.models.building.input.GetAllBuildingsBySiteInput;
 import com.cosc436002fitzarr.brm.models.building.input.UpdateBuildingInput;
-import com.cosc436002fitzarr.brm.models.user.input.GetAllUsersBySiteInput;
 import com.cosc436002fitzarr.brm.services.BuildingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -41,7 +38,7 @@ public class BuildingController {
     }
 
     @RequestMapping("/getBuildingsBySite")
-    public List<Building> getAllBuildingsBySite(@RequestBody GetAllBuildingsBySiteInput input) {
+    public List<Building> getAllBuildingsBySite(@RequestBody GetEntityBySiteInput input) {
         LOGGER.info(input.toString());
         return buildingService.getAllBuildingsBySite(input);
     }

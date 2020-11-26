@@ -134,6 +134,8 @@ public class BuildingRiskAssessmentService {
         return existingAssessment;
     }
 
+    // TODO: In this API you still have to update the pointers we have in risk assessment, building, and site maintenance associate ID. For example,
+    // TODO: If a building risk assessment is deleted, there is no way that the site maintenance associate will be assigned to risk assessments belonging to the building assessment
     public BuildingRiskAssessment deleteBuildingRiskAssessment(String id) {
         BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(id);
 

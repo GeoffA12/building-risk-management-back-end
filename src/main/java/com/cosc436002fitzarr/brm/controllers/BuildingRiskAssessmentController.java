@@ -20,30 +20,30 @@ public class BuildingRiskAssessmentController {
 
     private static Logger LOGGER = LoggerFactory.getLogger(BuildingRiskAssessmentController.class);
 
-    @PostMapping(value = "/updateBuildingRiskAssessments", consumes = "application/json", produces = "application/json")
-    public BuildingRiskAssessment updateBuildingRiskAssessments(@RequestBody UpdateBuildingRiskAssessmentInput requestBody) {
+    @PostMapping(value = "/updateBuildingRiskAssessment", consumes = "application/json", produces = "application/json")
+    public BuildingRiskAssessment updateBuildingRiskAssessment(@RequestBody UpdateBuildingRiskAssessmentInput requestBody) {
         LOGGER.info(requestBody.toString());
         return buildingRiskAssessmentsService.updateBuildingRiskAssessment(requestBody);
     }
 
-    @PostMapping(value = "/createBuildingRiskAssessments", consumes = "application/json", produces = "application/json")
-    public BuildingRiskAssessment createBuildingRiskAssessments(@RequestBody CreateBuildingRiskAssessmentInput requestBody) {
+    @PostMapping(value = "/createBuildingRiskAssessment", consumes = "application/json", produces = "application/json")
+    public BuildingRiskAssessment createBuildingRiskAssessment(@RequestBody CreateBuildingRiskAssessmentInput requestBody) {
         LOGGER.info(requestBody.toString());
         return buildingRiskAssessmentsService.createBuildingRiskAssessment(requestBody);
     }
 
-    @GetMapping(value = "/getBuildingRiskAssessmentsById")
-    public BuildingRiskAssessment getBuildingRiskAssessmentsById(@RequestParam(name="id") String id) {
+    @GetMapping(value = "/getBuildingRiskAssessmentById")
+    public BuildingRiskAssessment getBuildingRiskAssessmentById(@RequestParam(name="id") String id) {
         return buildingRiskAssessmentsService.getBuildingRiskAssessmentById(id);
     }
 
-    @DeleteMapping(value = "/deleteBuildingRiskAssessments")
-    public String deleteBuildingRiskAssessments(@RequestParam(name="id") String id) {
+    @DeleteMapping(value = "/deleteBuildingRiskAssessment")
+    public String deleteBuildingRiskAssessment(@RequestParam(name="id") String id) {
         BuildingRiskAssessment deletedBuildingRiskAssessment = buildingRiskAssessmentsService.deleteBuildingRiskAssessment(id);
         return "Deleted: " + deletedBuildingRiskAssessment.toString() + " from building risk assessments repository";
     }
 
-    @RequestMapping(value = "/getBuildingRiskAssessmentsBySite", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/getBuildingRiskAssessmentsBySite", consumes = "application/json", produces = "application/json")
     public List<BuildingRiskAssessment> getBuildingRiskAssessmentsBySite(@RequestBody GetEntityBySiteInput requestBody) {
         LOGGER.info(requestBody.toString());
         return buildingRiskAssessmentsService.getBuildingRiskAssessmentsBySite(requestBody);

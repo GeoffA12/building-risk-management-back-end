@@ -209,11 +209,19 @@ public class SiteMaintenanceManagerService {
 
         SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(existingSiteMaintenanceManager.getId(), maintenanceManagerId);
 
-        List<String> updatedBuildingRiskAssessmentIdsFiles = new ArrayList<>(updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled());
+        LOGGER.info(updatedSiteMaintenanceManager.toString());
 
-        updatedBuildingRiskAssessmentIdsFiles.add(buildingRiskAssessmentId);
+        List<String> updatedBuildingRiskAssessmentIdsFiled;
 
-        updatedSiteMaintenanceManager.setBuildingRiskAssessmentIdsFiled(updatedBuildingRiskAssessmentIdsFiles);
+        if (updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled() != null) {
+            updatedBuildingRiskAssessmentIdsFiled = new ArrayList<>(updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled());
+        } else {
+            updatedBuildingRiskAssessmentIdsFiled = new ArrayList<>();
+        }
+
+        updatedBuildingRiskAssessmentIdsFiled.add(buildingRiskAssessmentId);
+
+        updatedSiteMaintenanceManager.setBuildingRiskAssessmentIdsFiled(updatedBuildingRiskAssessmentIdsFiled);
 
         try {
             siteMaintenanceManagerRepository.save(updatedSiteMaintenanceManager);

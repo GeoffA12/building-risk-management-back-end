@@ -69,6 +69,7 @@ public class SiteMaintenanceManager extends User implements Entity {
     @Override
     public String toString() {
         return "SiteMaintenanceManager{" +
+                super.toString() +
                 "siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 ", buildingRiskAssessmentIdsFiled=" + buildingRiskAssessmentIdsFiled +
                 ", buildingIdsFiled=" + buildingIdsFiled +

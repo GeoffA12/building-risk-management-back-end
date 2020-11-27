@@ -1,6 +1,7 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.input.CreateSiteMaintenanceAssociateInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -93,6 +94,10 @@ public class SiteMaintenanceAssociateService {
             LOGGER.info("Site maintenance associate: " + potentialSiteMaintenanceAssociate.get().toString() + " successfully fetched from site maintenance associate repository");
             return potentialSiteMaintenanceAssociate.get();
         }
+    }
+
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySite(GetEntityBySiteInput input) {
+        return siteMaintenanceAssociateRepository.getSiteMaintenanceAssociatesBySite(input.getAssociatedSiteIds());
     }
 
     public SiteMaintenanceAssociate updateSiteMaintenanceAssociate(UpdateUserInput input) {

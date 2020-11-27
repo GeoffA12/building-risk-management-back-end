@@ -65,9 +65,6 @@ public class RiskAssessmentService {
         try {
             riskAssessmentRepository.save(riskAssessmentForPersistence);
             LOGGER.info("Persisted new risk assessment: " + riskAssessmentForPersistence.toString() + " to the risk assessment repository");
-            // TODO: Same comment as in the delete API. Since we have a property riskAssessmentsFiledIds in the WHS Member User Class, we need to update their
-            // TODO: property in this API. You can create a new internal API in the whsMemberService file 'attachNewRiskAssessmentToWhsMember' which will
-            // TODO: update that whs member's riskAssessmentFiled list, and then save that updated whs member to their repository.
         } catch(Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException();
@@ -155,7 +152,7 @@ public class RiskAssessmentService {
         Page<RiskAssessment> sortedRiskAssessmentsInPage = riskAssessmentRepository.findAll(pageInput);
         List<RiskAssessment> riskAssessmentContent = sortedRiskAssessmentsInPage.getContent();
 
-        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersByUserIdAndSite(input.getAssociatedSiteIds());
+        List<WorkplaceHealthSafetyMember> filteredWorkplaceHealthSafetyMembers = workplaceHealthSafetyMemberService.getWorkplaceHealthSafetyMembersBySite(input.getAssociatedSiteIds());
         List<String> whsMemberSubmittedRiskAssessmentIds = new ArrayList<>();
         for (WorkplaceHealthSafetyMember whsMember : filteredWorkplaceHealthSafetyMembers) {
             whsMemberSubmittedRiskAssessmentIds.addAll(whsMember.getRiskAssessmentsFiledIds());
@@ -171,23 +168,45 @@ public class RiskAssessmentService {
     }
 
     public RiskAssessment deleteRiskAssessment(String id, String publisherId) {
+        RiskAssessment assessmentToDelete = checkRiskAssessmentExists(id);
+        riskAssessmentRepository.deleteById(id);
+        LOGGER.info("Risk assessment: " + assessmentToDelete.toString() + " successfully fetched and deleted from risk assessment repository");
+        workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(assessmentToDelete.getId(), publisherId);
+        return assessmentToDelete;
+    }
+
+    public void attachBuildingRiskAssessmentAttributesToRiskAssessments(List<String> existingRiskAssessmentId, Long workOrder, String buildingId, String publisherId) {
+        for (String riskAssessmentId : existingRiskAssessmentId) {
+            RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
+
+            RiskAssessment updatedAssessmentForPersistence = getUpdatedRiskAssessment(riskAssessmentToAttachNewBuildingRiskAssessment.getId(), publisherId);
+
+            // TODO: Continue adding setters once due date and risk level are integrated with the building risk assessment input
+            updatedAssessmentForPersistence.setWorkOrder(workOrder);
+
+            updatedAssessmentForPersistence.setBuildingId(buildingId);
+
+            try {
+                riskAssessmentRepository.save(updatedAssessmentForPersistence);
+                LOGGER.info("Risk assessment with id: " + updatedAssessmentForPersistence.toString() + " updated in " +
+                        "risk assessment repository");
+            } catch (Exception e) {
+                LOGGER.info(e.toString());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public RiskAssessment checkRiskAssessmentExists(String id) {
         Optional<RiskAssessment> potentialRiskAssessment = riskAssessmentRepository.findById(id);
-        Boolean riskAssessmentIsPresent = potentialRiskAssessment.isPresent();
-        if (!riskAssessmentIsPresent) {
+        Boolean riskAssessmentPresent = potentialRiskAssessment.isPresent();
+        if (!riskAssessmentPresent) {
             LOGGER.info("Risk assessment with id: " + id + " not found in the risk assessment repository!");
             throw new EntityNotFoundException("Risk assessment with id: " + id + " not found in the risk assessment repository!");
         }
-        else {
-            riskAssessmentRepository.deleteById(id);
-            LOGGER.info("Risk assessment: " + potentialRiskAssessment.get().toString() + " successfully fetched and deleted from risk assessment repository");
-            RiskAssessment deletedRiskAssessment = potentialRiskAssessment.get();
-            // TODO: Remember that we're storing a riskAssessmentFiledIds property in each whsmember. When someone deletes a risk assessment we should update the user
-            // TODO: who submitted this risk assessments ID list so that it no longer contains the id of the deleted risk assessment.
-            // TODO: Get the whs member using the publisherId passed into this API. You'll need to write a service function in the whsmemberservice file which
-            // TODO: will update the whs member's riskAssessmentFiledId's list (it should remove the id from their list and then save that update)
-            workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(id, publisherId);
-            return deletedRiskAssessment;
-        }
+        LOGGER.info("Risk assessment: " + potentialRiskAssessment.get().toString() + " successfully fetched and deleted from risk assessment repository");
+        RiskAssessment existingRiskAssessment = potentialRiskAssessment.get();
+        return existingRiskAssessment;
     }
 
     public String getCreatedRiskAssessmentMessage() {

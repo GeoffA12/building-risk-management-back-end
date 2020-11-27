@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.controllers;
 
+import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.input.CreateSiteMaintenanceAssociateInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class SiteMaintenanceAssociateController {
@@ -37,5 +40,11 @@ public class SiteMaintenanceAssociateController {
     public String deleteSiteMaintenanceAssociate(@RequestParam(name = "id") String id, @RequestParam(name="userId") String userId) {
         SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(id, userId);
         return "Deleted: " + deletedSiteMaintenanceAssociate.toString() + " from site maintenance associate repository";
+    }
+
+    @RequestMapping(value = "/getSiteMaintenanceAssociatesBySite", consumes = "application/json", produces = "application/json")
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySite(@RequestBody GetEntityBySiteInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return siteMaintenanceAssociateService.getSiteMaintenanceAssociatesBySite(requestBody);
     }
 }

@@ -5,9 +5,6 @@ import com.cosc436002fitzarr.brm.models.user.User;
 
 import com.cosc436002fitzarr.brm.models.user.input.GetAllUsersBySiteInput;
 
-import com.cosc436002fitzarr.brm.models.ReferenceInput;
-import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
-
 import com.cosc436002fitzarr.brm.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

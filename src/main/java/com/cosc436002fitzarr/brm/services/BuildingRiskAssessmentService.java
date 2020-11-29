@@ -59,7 +59,8 @@ public class BuildingRiskAssessmentService {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
         }
-        riskAssessmentService.attachBuildingRiskAssessmentAttributesToRiskAssessments(input.getRiskAssessmentIds(), input.getWorkOrder(), input.getBuildingId(), input.getPublisherId());
+        riskAssessmentService.attachBuildingRiskAssessmentAttributesToRiskAssessments(input.getRiskAssessmentIds(), input.getWorkOrder(),
+                input.getBuildingId(), input.getSiteMaintenanceAssociateIds(), input.getPublisherId(), buildingRiskAssessmentForPersistence.getId());
         siteMaintenanceManagerService.attachNewBuildingRiskAssessmentToSiteMaintenanceManager(input.getPublisherId(), buildingRiskAssessmentForPersistence.getId());
         return buildingRiskAssessmentForPersistence;
     }
@@ -118,6 +119,8 @@ public class BuildingRiskAssessmentService {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
         }
+        riskAssessmentService.attachBuildingRiskAssessmentAttributesToRiskAssessments(input.getRiskAssessmentIds(), input.getWorkOrder(),
+                input.getBuildingId(), input.getSiteMaintenanceAssociateIds(), input.getPublisherId(), updatedBuildingRiskAssessment.getId());
         return updatedBuildingRiskAssessmentForPersistence;
     }
 

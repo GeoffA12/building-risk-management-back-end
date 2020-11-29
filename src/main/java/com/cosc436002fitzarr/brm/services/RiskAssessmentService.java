@@ -175,7 +175,8 @@ public class RiskAssessmentService {
         return assessmentToDelete;
     }
 
-    public void attachBuildingRiskAssessmentAttributesToRiskAssessments(List<String> existingRiskAssessmentId, Long workOrder, String buildingId, String publisherId) {
+    public void attachBuildingRiskAssessmentAttributesToRiskAssessments(List<String> existingRiskAssessmentId, Long workOrder, String buildingId,
+                                                                        List<String> siteMaintenanceAssociateIds, String publisherId, String buildingRiskAssessmentId) {
         for (String riskAssessmentId : existingRiskAssessmentId) {
             RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
 
@@ -184,7 +185,12 @@ public class RiskAssessmentService {
             // TODO: Continue adding setters once due date and risk level are integrated with the building risk assessment input
             updatedAssessmentForPersistence.setWorkOrder(workOrder);
 
-            updatedAssessmentForPersistence.setBuildingId(buildingId);
+            updatedAssessmentForPersistence.setSiteMaintenanceAssociateIds(siteMaintenanceAssociateIds);
+
+            // TODO: Need to change this property name in the model
+            updatedAssessmentForPersistence.setBuildingId(buildingRiskAssessmentId);
+
+            updatedAssessmentForPersistence.setStatus(Status.IN_PROGRESS);
 
             try {
                 riskAssessmentRepository.save(updatedAssessmentForPersistence);

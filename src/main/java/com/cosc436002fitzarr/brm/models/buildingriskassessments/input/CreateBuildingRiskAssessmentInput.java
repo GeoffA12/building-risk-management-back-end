@@ -7,24 +7,19 @@ import java.util.Objects;
 
 public class CreateBuildingRiskAssessmentInput {
     private String publisherId;
-    private List<String> riskAssessmentIds;
-    private List<String> siteMaintenanceAssociateIds;
     private String buildingId;
     private String title;
     private String description;
-    private Long workOrder;
+    private List<String> riskAssessmentIds;
 
     @JsonCreator
-    public CreateBuildingRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty List<String> riskAssessmentIds,
-                                             @JsonProperty List<String> siteMaintenanceAssociateIds, @JsonProperty String buildingId,
-                                             @JsonProperty String title, @JsonProperty String description, @JsonProperty Long workOrder) {
+    public CreateBuildingRiskAssessmentInput(@JsonProperty String publisherId, @JsonProperty String buildingId, @JsonProperty String title,
+                                             @JsonProperty String description, @JsonProperty List<String> riskAssessmentIds) {
         this.publisherId = publisherId;
-        this.riskAssessmentIds = riskAssessmentIds;
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
         this.buildingId = buildingId;
         this.title = title;
         this.description = description;
-        this.workOrder = workOrder;
+        this.riskAssessmentIds = riskAssessmentIds;
     }
 
     public String getPublisherId() {
@@ -33,14 +28,6 @@ public class CreateBuildingRiskAssessmentInput {
 
     public void setPublisherId(String publisherId) {
         this.publisherId = publisherId;
-    }
-
-    public List<String> getRiskAssessmentIds() {
-        return riskAssessmentIds;
-    }
-
-    public void setRiskAssessmentIds(List<String> riskAssessmentIds) {
-        this.riskAssessmentIds = riskAssessmentIds;
     }
 
     public String getBuildingId() {
@@ -67,20 +54,12 @@ public class CreateBuildingRiskAssessmentInput {
         this.description = description;
     }
 
-    public List<String> getSiteMaintenanceAssociateIds() {
-        return siteMaintenanceAssociateIds;
+    public List<String> getRiskAssessmentIds() {
+        return riskAssessmentIds;
     }
 
-    public void setSiteMaintenanceAssociateIds(List<String> siteMaintenanceAssociateIds) {
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
-    }
-
-    public Long getWorkOrder() {
-        return workOrder;
-    }
-
-    public void setWorkOrder(Long workOrder) {
-        this.workOrder = workOrder;
+    public void setRiskAssessmentIds(List<String> riskAssessmentIds) {
+        this.riskAssessmentIds = riskAssessmentIds;
     }
 
     @Override
@@ -88,30 +67,22 @@ public class CreateBuildingRiskAssessmentInput {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateBuildingRiskAssessmentInput that = (CreateBuildingRiskAssessmentInput) o;
-        return getPublisherId().equals(that.getPublisherId()) &&
-                getRiskAssessmentIds().equals(that.getRiskAssessmentIds()) &&
-                getSiteMaintenanceAssociateIds().equals(that.getSiteMaintenanceAssociateIds()) &&
-                getBuildingId().equals(that.getBuildingId()) &&
-                getTitle().equals(that.getTitle()) &&
-                getDescription().equals(that.getDescription()) &&
-                getWorkOrder().equals(that.getWorkOrder());
+        return getPublisherId().equals(that.getPublisherId()) && getBuildingId().equals(that.getBuildingId()) && getTitle().equals(that.getTitle()) && getDescription().equals(that.getDescription()) && getRiskAssessmentIds().equals(that.getRiskAssessmentIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPublisherId(), getRiskAssessmentIds(), getSiteMaintenanceAssociateIds(), getBuildingId(), getTitle(), getDescription(), getWorkOrder());
+        return Objects.hash(getPublisherId(), getBuildingId(), getTitle(), getDescription(), getRiskAssessmentIds());
     }
 
     @Override
     public String toString() {
-        return "CreateBuildingRiskAssessmentsInput{" +
+        return "CreateBuildingRiskAssessmentInput{" +
                 "publisherId='" + publisherId + '\'' +
-                ", riskAssessmentIds=" + riskAssessmentIds +
-                ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 ", buildingId='" + buildingId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", workOrder=" + workOrder +
+                ", riskAssessmentIds='" + riskAssessmentIds + '\'' +
                 '}';
     }
 }

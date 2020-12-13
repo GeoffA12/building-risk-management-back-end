@@ -83,15 +83,7 @@ public class BuildingService {
     }
 
     public Building getUpdatedBuilding(String existingBuildingId, String publisherId) {
-        Optional<Building> potentialBuilding = buildingRepository.findById(existingBuildingId);
-        if (!potentialBuilding.isPresent()) {
-            LOGGER.info("Building with id: " + existingBuildingId + " not found in building repository");
-            throw new EntityNotFoundException();
-        }
-
-        Building existingBuilding = potentialBuilding.get();
-
-        LOGGER.info("Successfully retrieved building: " + existingBuilding.toString() + " out of repository to update.");
+        Building existingBuilding = checkBuildingExists(existingBuildingId);
 
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
@@ -105,20 +97,23 @@ public class BuildingService {
 
         existingBuilding.setEntityTrail(updatedTrail);
 
+        existingBuilding.setUpdatedAt(currentTime);
+
         return existingBuilding;
     }
 
-    public Building getById(String id) {
+    public Building checkBuildingExists(String id) {
         Optional<Building> potentialBuilding = buildingRepository.findById(id);
-        Boolean buildingIsPresent = potentialBuilding.isPresent();
-        if (!buildingIsPresent) {
+        if (!potentialBuilding.isPresent()) {
             LOGGER.info("Building with id: " + id + " not found in the building repository!");
             throw new EntityNotFoundException("Building with id: " + id + " not found in the building repository!");
         }
-        else {
-            LOGGER.info("Building: " + potentialBuilding.get().toString() + " successfully fetched from building repository");
-            return potentialBuilding.get();
-        }
+        LOGGER.info("Building: " + potentialBuilding.get().toString() + " successfully fetched from building repository");
+        return potentialBuilding.get();
+    }
+
+    public Building getById(String id) {
+        return checkBuildingExists(id);
     }
 
     public List<Building> getAllBuildingsBySite(GetEntityBySiteInput input) {
@@ -131,18 +126,23 @@ public class BuildingService {
         return matchingBuildingsBySiteId;
     }
 
-    public Building deleteBuilding(String id) {
-        Optional<Building> potentialBuilding = buildingRepository.findById(id);
-        Boolean buildingIsPresent = potentialBuilding.isPresent();
-        if (!buildingIsPresent) {
-            LOGGER.info("Building with id: " + id + " not found in the building repository!");
-            throw new EntityNotFoundException("Building with id: " + id + " not found in the building repository!");
-        }
-        else {
-            buildingRepository.deleteById(id);
-            LOGGER.info("Building: " + potentialBuilding.get().toString() + " successfully fetched and deleted from building repository");
-            Building deletedBuilding = potentialBuilding.get();
-            return deletedBuilding;
+    public void removeBuildingRiskAssessmentFromBuilding(String buildingId, String buildingRiskAssessmentId, String publisherId) {
+        Building existingBuilding = checkBuildingExists(buildingId);
+
+        Building updatedBuilding = getUpdatedBuilding(existingBuilding.getId(), publisherId);
+
+        List<String> existingBuildingRiskAssessmentIds = updatedBuilding.getBuildingRiskAssessmentIds();
+
+        existingBuildingRiskAssessmentIds.remove(buildingRiskAssessmentId);
+
+        updatedBuilding.setBuildingRiskAssessmentIds(existingBuildingRiskAssessmentIds);
+
+        try {
+            buildingRepository.save(updatedBuilding);
+            LOGGER.info("Building: " + updatedBuilding.toString() + " successfully saved in building repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
         }
     }
 

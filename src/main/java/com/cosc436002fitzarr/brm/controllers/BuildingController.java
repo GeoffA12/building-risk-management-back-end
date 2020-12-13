@@ -42,10 +42,4 @@ public class BuildingController {
         LOGGER.info(input.toString());
         return buildingService.getAllBuildingsBySite(input);
     }
-
-    @DeleteMapping(value = "/deleteBuilding")
-    public String deleteBuilding(@RequestParam(name="id") String id) {
-        Building deletedBuilding = buildingService.deleteBuilding(id);
-        return "Deleted: " + deletedBuilding.toString() + " from building repository";
-    }
 }

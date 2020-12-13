@@ -4,7 +4,10 @@ package com.cosc436002fitzarr.brm.services;
 import com.cosc436002fitzarr.brm.enums.RiskLevel;
 import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.AttachRiskAssessmentsToBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.RiskAssessmentAttachmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
+import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessmentSchedule;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.GetAllRiskAssessmentsBySiteInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.UpdateRiskAssessmentInput;
@@ -23,6 +26,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,8 +36,8 @@ public class RiskAssessmentService {
     public RiskAssessmentRepository riskAssessmentRepository;
     @Autowired
     public WorkplaceHealthSafetyMemberService workplaceHealthSafetyMemberService;
-
-    private static final Long DEFAULT_WORK_ORDER = 0L;
+    @Autowired
+    public SiteMaintenanceAssociateService siteMaintenanceAssociateService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(RiskAssessmentService.class);
 
@@ -42,7 +46,7 @@ public class RiskAssessmentService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
         List<EntityTrail> entityTrail = new ArrayList<>();
         entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedRiskAssessmentMessage()));
-        List<String> siteMaintenanceAssociateIds = new ArrayList<>();
+        List<RiskAssessmentSchedule> riskAssessmentSchedules = new ArrayList<>();
 
         RiskAssessment riskAssessmentForPersistence = new RiskAssessment(
             id,
@@ -50,16 +54,11 @@ public class RiskAssessmentService {
             currentTime,
             entityTrail,
             input.getPublisherId(),
-            DEFAULT_WORK_ORDER,
             input.getTitle(),
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            null,
-            Status.NOT_ASSIGNED,
-            null,
-            RiskLevel.EMPTY,
-            siteMaintenanceAssociateIds
+            riskAssessmentSchedules
         );
 
         try {
@@ -84,16 +83,11 @@ public class RiskAssessmentService {
             currentTime,
             updatedRiskAssessment.getEntityTrail(),
             input.getPublisherId(),
-            updatedRiskAssessment.getWorkOrder(),
             input.getTitle(),
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            updatedRiskAssessment.getBuildingId(),
-            updatedRiskAssessment.getStatus(),
-            updatedRiskAssessment.getDueDate(),
-            updatedRiskAssessment.getRiskLevel(),
-            updatedRiskAssessment.getSiteMaintenanceAssociateIds()
+            input.getRiskAssessmentSchedules()
         );
 
         try {
@@ -128,6 +122,8 @@ public class RiskAssessmentService {
         updatedTrail.add(updateTrail);
 
         existingRiskAssessment.setEntityTrail(updatedTrail);
+
+        existingRiskAssessment.setUpdatedAt(currentTime);
 
         return existingRiskAssessment;
     }
@@ -175,22 +171,31 @@ public class RiskAssessmentService {
         return assessmentToDelete;
     }
 
-    public void attachBuildingRiskAssessmentAttributesToRiskAssessments(List<String> existingRiskAssessmentId, Long workOrder, String buildingId,
-                                                                        List<String> siteMaintenanceAssociateIds, String publisherId, String buildingRiskAssessmentId) {
-        for (String riskAssessmentId : existingRiskAssessmentId) {
-            RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
+    public void attachRiskAssessmentSchedulesToRiskAssessment(AttachRiskAssessmentsToBuildingRiskAssessmentInput input) {
+        for (RiskAssessmentAttachmentInput riskAssessmentAttachmentInput : input.getRiskAssessmentAttachmentInputList()) {
 
-            RiskAssessment updatedAssessmentForPersistence = getUpdatedRiskAssessment(riskAssessmentToAttachNewBuildingRiskAssessment.getId(), publisherId);
+            RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentAttachmentInput.getRiskAssessmentId());
 
-            // TODO: Continue adding setters once due date and risk level are integrated with the building risk assessment input
-            updatedAssessmentForPersistence.setWorkOrder(workOrder);
+            RiskAssessment updatedAssessmentForPersistence = getUpdatedRiskAssessment(riskAssessmentToAttachNewBuildingRiskAssessment.getId(), input.getPublisherId());
 
-            updatedAssessmentForPersistence.setSiteMaintenanceAssociateIds(siteMaintenanceAssociateIds);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(riskAssessmentAttachmentInput.getDueDate());
 
-            // TODO: Need to change this property name in the model
-            updatedAssessmentForPersistence.setBuildingId(buildingRiskAssessmentId);
+            LocalDateTime dueDate = LocalDateTime.parse(riskAssessmentAttachmentInput.getDueDate(), dateTimeFormatter);
 
-            updatedAssessmentForPersistence.setStatus(Status.IN_PROGRESS);
+            RiskAssessmentSchedule newAssessmentSchedule = new RiskAssessmentSchedule(
+                riskAssessmentAttachmentInput.getBuildingId(),
+                Status.IN_PROGRESS,
+                dueDate,
+                RiskLevel.EMPTY,
+                riskAssessmentAttachmentInput.getSiteMaintenanceAssociateIds(),
+                riskAssessmentAttachmentInput.getWorkOrder()
+            );
+
+            List<RiskAssessmentSchedule> updatedAssessmentScheduleList = updatedAssessmentForPersistence.getRiskAssessmentSchedules();
+
+            updatedAssessmentScheduleList.add(newAssessmentSchedule);
+
+            updatedAssessmentForPersistence.setRiskAssessmentSchedules(updatedAssessmentScheduleList);
 
             try {
                 riskAssessmentRepository.save(updatedAssessmentForPersistence);
@@ -199,6 +204,37 @@ public class RiskAssessmentService {
             } catch (Exception e) {
                 LOGGER.info(e.toString());
                 throw new RuntimeException(e);
+            }
+            for (String siteMaintenanceAssociateId : riskAssessmentAttachmentInput.getSiteMaintenanceAssociateIds()) {
+                siteMaintenanceAssociateService.assignRiskAssessmentToSiteMaintenanceAssociate(siteMaintenanceAssociateId, riskAssessmentAttachmentInput.getRiskAssessmentId(), input.getPublisherId());
+            }
+        }
+    }
+
+    // TODO: This API Should be publicly accessible and should be invoked whenever after a building risk assessment is deleted.
+    public void removeRiskAssessmentSchedulesFromRiskAssessment(AttachRiskAssessmentsToBuildingRiskAssessmentInput input) {
+        for (RiskAssessmentAttachmentInput riskAssessmentAttachmentInput : input.getRiskAssessmentAttachmentInputList()) {
+            RiskAssessment existingRiskAssessment = checkRiskAssessmentExists(riskAssessmentAttachmentInput.getRiskAssessmentId());
+
+            RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(existingRiskAssessment.getId(), input.getPublisherId());
+
+            List<RiskAssessmentSchedule> existingSchedules = updatedRiskAssessment.getRiskAssessmentSchedules();
+
+            existingSchedules.remove(riskAssessmentAttachmentInput);
+
+            updatedRiskAssessment.setRiskAssessmentSchedules(existingSchedules);
+
+            try {
+                riskAssessmentRepository.save(updatedRiskAssessment);
+                LOGGER.info("Risk assessment with id: " + updatedRiskAssessment.toString() + " updated in " +
+                        "risk assessment repository");
+            } catch (Exception e) {
+                LOGGER.info(e.toString());
+                throw new RuntimeException(e);
+            }
+
+            for (String siteMaintenanceAssociateId : riskAssessmentAttachmentInput.getSiteMaintenanceAssociateIds()) {
+                siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentAttachmentInput.getRiskAssessmentId(), input.getPublisherId());
             }
         }
     }

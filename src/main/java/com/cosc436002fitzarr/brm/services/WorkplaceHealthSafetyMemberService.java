@@ -30,6 +30,8 @@ public class WorkplaceHealthSafetyMemberService {
     public UserRepository userRepository;
     @Autowired
     public SiteService siteService;
+    @Autowired
+    public RiskAssessmentService riskAssessmentService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(WorkplaceHealthSafetyMemberService.class);
 
@@ -114,10 +116,10 @@ public class WorkplaceHealthSafetyMemberService {
 
         WorkplaceHealthSafetyMember updatedWorkplaceHealthSafetyMemberForPersistence = new WorkplaceHealthSafetyMember(
             existingWorkplaceHealthSafetyMember.getId(),
-            currentTime,
             existingWorkplaceHealthSafetyMember.getCreatedAt(),
+            currentTime,
             updatedTrail,
-            input.getUserId(),
+            existingWorkplaceHealthSafetyMember.getPublisherId(),
             existingWorkplaceHealthSafetyMember.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
@@ -144,6 +146,7 @@ public class WorkplaceHealthSafetyMemberService {
         return updatedWorkplaceHealthSafetyMemberForPersistence;
     }
 
+    // TODO: When a WHS member is deleted, we also need to delete all of their risk assessments they've filed.
     public WorkplaceHealthSafetyMember deleteWorkplaceHealthSafetyMember(String id, String userId) {
         UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
         Optional<WorkplaceHealthSafetyMember> potentialWorkplaceHealthSafetyMember = workplaceHealthSafetyMemberRepository.findById(id);
@@ -158,6 +161,7 @@ public class WorkplaceHealthSafetyMemberService {
                     "deleted from workplace health and safety and user repositories");
             WorkplaceHealthSafetyMember deletedWorkplaceHealthSafetyMember = potentialWorkplaceHealthSafetyMember.get();
             siteService.removeAssociatedSiteIdsFromSites(deletedWorkplaceHealthSafetyMember.getAssociatedSiteIds(), deletedWorkplaceHealthSafetyMember.getId(), userId);
+            riskAssessmentService.deleteRiskAssessmentsAfterWHSMemberDeleted(deletedWorkplaceHealthSafetyMember.getRiskAssessmentsFiledIds(), userId);
             return deletedWorkplaceHealthSafetyMember;
         }
     }
@@ -186,21 +190,21 @@ public class WorkplaceHealthSafetyMemberService {
         updatedRiskAssessmentsFiledIds.add(riskAssessmentId);
 
         WorkplaceHealthSafetyMember updatedWorkplaceHealthSafetyMemberForPersistence = new WorkplaceHealthSafetyMember(
-                existingWorkplaceHealthSafetyMember.getId(),
-                currentTime,
-                existingWorkplaceHealthSafetyMember.getCreatedAt(),
-                updatedTrail,
-                existingWorkplaceHealthSafetyMember.getId(),
-                existingWorkplaceHealthSafetyMember.getSiteRole(),
-                existingWorkplaceHealthSafetyMember.getFirstName(),
-                existingWorkplaceHealthSafetyMember.getLastName(),
-                existingWorkplaceHealthSafetyMember.getUsername(),
-                existingWorkplaceHealthSafetyMember.getEmail(),
-                existingWorkplaceHealthSafetyMember.getPhone(),
-                existingWorkplaceHealthSafetyMember.getAuthToken(),
-                existingWorkplaceHealthSafetyMember.getHashPassword(),
-                existingWorkplaceHealthSafetyMember.getAssociatedSiteIds(),
-                updatedRiskAssessmentsFiledIds
+            existingWorkplaceHealthSafetyMember.getId(),
+            currentTime,
+            existingWorkplaceHealthSafetyMember.getCreatedAt(),
+            updatedTrail,
+            existingWorkplaceHealthSafetyMember.getPublisherId(),
+            existingWorkplaceHealthSafetyMember.getSiteRole(),
+            existingWorkplaceHealthSafetyMember.getFirstName(),
+            existingWorkplaceHealthSafetyMember.getLastName(),
+            existingWorkplaceHealthSafetyMember.getUsername(),
+            existingWorkplaceHealthSafetyMember.getEmail(),
+            existingWorkplaceHealthSafetyMember.getPhone(),
+            existingWorkplaceHealthSafetyMember.getAuthToken(),
+            existingWorkplaceHealthSafetyMember.getHashPassword(),
+            existingWorkplaceHealthSafetyMember.getAssociatedSiteIds(),
+            updatedRiskAssessmentsFiledIds
         );
 
         try {
@@ -242,7 +246,7 @@ public class WorkplaceHealthSafetyMemberService {
                 currentTime,
                 existingWorkplaceHealthSafetyMember.getCreatedAt(),
                 updatedTrail,
-                existingWorkplaceHealthSafetyMember.getId(),
+                existingWorkplaceHealthSafetyMember.getPublisherId(),
                 existingWorkplaceHealthSafetyMember.getSiteRole(),
                 existingWorkplaceHealthSafetyMember.getFirstName(),
                 existingWorkplaceHealthSafetyMember.getLastName(),

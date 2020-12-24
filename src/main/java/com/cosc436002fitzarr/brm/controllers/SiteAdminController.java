@@ -40,7 +40,7 @@ public class SiteAdminController {
     }
 
     @DeleteMapping(value = "/deleteSiteAdmin")
-    public String deleteSiteAdmin(@RequestParam(name="id") String id, @RequestParam(name="userid") String userId) {
+    public String deleteSiteAdmin(@RequestParam(name="id") String id, @RequestParam(name="userId") String userId) {
         SiteAdmin deletedSiteAdmin = siteAdminService.deleteSiteAdmin(id, userId);
         return "Deleted: " + deletedSiteAdmin.toString() + " from site admin repository";
     }

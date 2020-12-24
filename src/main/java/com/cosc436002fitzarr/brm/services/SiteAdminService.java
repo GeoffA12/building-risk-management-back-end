@@ -77,43 +77,22 @@ public class SiteAdminService {
     }
 
     public SiteAdmin updateSiteAdmin(UpdateUserInput input) {
-        Optional<SiteAdmin> potentialSiteAdmin;
-
-        potentialSiteAdmin = siteAdminRepository.findById(input.getId());
-
-        if (!potentialSiteAdmin.isPresent()) {
-            throw new EntityNotFoundException("Site Admin with id" + input.getId() + " not found in the site admin repository!");
-        }
-
-        SiteAdmin existingSiteAdmin = potentialSiteAdmin.get();
-        LOGGER.info("Successfully retrieved site admin user: " + existingSiteAdmin.toString() + " out of repository to update.");
-
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-
-        // TODO: Refactor the UpdateUserInput class so that a publisherId in the input object. Otherwise, we have no way of knowing the ID of whoever is updating this
-        // specific site admin and can't update the Entity Trail accordingly.
-        EntityTrail updateTrail = new EntityTrail(currentTime, input.getUserId(), getUpdatedSiteAdminMessage());
-
-        List<EntityTrail> existingTrail = existingSiteAdmin.getEntityTrail();
-
-        List<EntityTrail> updatedTrail = new ArrayList<>(existingTrail);
-
-        updatedTrail.add(updateTrail);
+        SiteAdmin updatedSiteAdmin = getUpdatedSiteAdmin(input.getId(), input.getUserId());
 
         SiteAdmin updatedSiteAdminForPersistence = new SiteAdmin(
-            existingSiteAdmin.getId(),
-            currentTime,
-            existingSiteAdmin.getCreatedAt(),
-            updatedTrail,
-            input.getUserId(),
-            existingSiteAdmin.getSiteRole(),
+            updatedSiteAdmin.getId(),
+            updatedSiteAdmin.getCreatedAt(),
+            updatedSiteAdmin.getUpdatedAt(),
+            updatedSiteAdmin.getEntityTrail(),
+            updatedSiteAdmin.getPublisherId(),
+            updatedSiteAdmin.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
             input.getEmail(),
             input.getPhone(),
-            existingSiteAdmin.getAuthToken(),
-            existingSiteAdmin.getHashPassword(),
+            updatedSiteAdmin.getAuthToken(),
+            updatedSiteAdmin.getHashPassword(),
             input.getSiteIds()
         );
 
@@ -129,15 +108,17 @@ public class SiteAdminService {
         return updatedSiteAdminForPersistence;
     }
 
-    public SiteAdmin getUpdatedSiteAdmin(String existingSiteAdminId, String userId) {
-        Optional<SiteAdmin> potentialSiteAdmin = siteAdminRepository.findById(existingSiteAdminId);
+    public SiteAdmin checkSiteAdminExists(String id) {
+        Optional<SiteAdmin> potentialSiteAdmin = siteAdminRepository.findById(id);
         if (!potentialSiteAdmin.isPresent()) {
-            LOGGER.info("Site admin with id: " + existingSiteAdminId + " not found in site admin repository");
-            throw new EntityNotFoundException();
+            LOGGER.info("Site admin with id: " + id + " not found in site admin repository");
+            throw new EntityNotFoundException("Site admin with id: " + id + " not found in site admin repository");
         }
+        return potentialSiteAdmin.get();
+    }
 
-        SiteAdmin existingSiteAdmin = potentialSiteAdmin.get();
-        LOGGER.info("Successfully retrieved site: " + existingSiteAdmin.toString() + " out of repository to update.");
+    public SiteAdmin getUpdatedSiteAdmin(String existingSiteAdminId, String userId) {
+        SiteAdmin existingSiteAdmin = checkSiteAdminExists(existingSiteAdminId);
 
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
@@ -150,6 +131,8 @@ public class SiteAdminService {
         updatedTrail.add(updateTrail);
 
         existingSiteAdmin.setEntityTrail(updatedTrail);
+
+        existingSiteAdmin.setUpdatedAt(currentTime);
 
         return existingSiteAdmin;
     }

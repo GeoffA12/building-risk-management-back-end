@@ -21,6 +21,8 @@ import java.util.*;
 public class BuildingService {
     @Autowired
     public BuildingRepository buildingRepository;
+    @Autowired
+    public BuildingRiskAssessmentService buildingRiskAssessmentService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(BuildingService.class);
 
@@ -55,16 +57,14 @@ public class BuildingService {
     }
 
     public Building updateBuilding(UpdateBuildingInput input) {
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-
         Building updatedBuilding = getUpdatedBuilding(input.getId(), input.getPublisherId());
 
         Building updatedBuildingForPersistence = new Building(
                 updatedBuilding.getId(),
                 updatedBuilding.getCreatedAt(),
-                currentTime,
+                updatedBuilding.getUpdatedAt(),
                 updatedBuilding.getEntityTrail(),
-                input.getPublisherId(),
+                updatedBuilding.getPublisherId(),
                 input.getName(),
                 input.getCode(),
                 input.getSiteId(),
@@ -80,6 +80,22 @@ public class BuildingService {
             throw new RuntimeException(e);
         }
         return updatedBuildingForPersistence;
+    }
+
+    // When a building is deleted, we should
+    // 1. Delete the building
+    // 2. Delete all of the building risk assessments which were attached to the building deleted
+    public Building deleteBuilding(String id, String publisherId) {
+        Building buildingToDelete = checkBuildingExists(id);
+        buildingRiskAssessmentService.deleteBuildingRiskAssessments(buildingToDelete.getBuildingRiskAssessmentIds(), publisherId);
+        try {
+            buildingRepository.deleteById(buildingToDelete.getId());
+            LOGGER.info("Building: " + buildingToDelete.toString() + " deleted from building repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+        return buildingToDelete;
     }
 
     public Building getUpdatedBuilding(String existingBuildingId, String publisherId) {

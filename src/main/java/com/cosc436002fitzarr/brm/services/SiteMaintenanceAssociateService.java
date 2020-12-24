@@ -32,6 +32,8 @@ public class SiteMaintenanceAssociateService {
     public SiteService siteService;
     @Autowired
     public SiteMaintenanceManagerService siteMaintenanceManagerService;
+    @Autowired
+    public RiskAssessmentService riskAssessmentService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteMaintenanceAssociateService.class);
 
@@ -121,38 +123,26 @@ public class SiteMaintenanceAssociateService {
     public SiteMaintenanceAssociate updateSiteMaintenanceAssociate(UpdateUserInput input) {
         SiteMaintenanceAssociate existingSiteMaintenanceAssociate = checkSiteMaintenanceAssociateExists(input.getId());
 
-        LOGGER.info("Successfully retrieved site maintenance associate user: " + existingSiteMaintenanceAssociate.toString() + " out of repository to update.");
-
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-
-        // TODO: Refactor the UpdateUserInput class so that a publisherId in the input object. Otherwise, we have no way of knowing the ID of whoever is updating this
-        // specific site admin and can't update the Entity Trail accordingly.
-        EntityTrail updateTrail = new EntityTrail(currentTime, input.getUserId(), getSiteMaintenanceAssociateUpdatedSystemComment());
-
-        List<EntityTrail> existingTrail = existingSiteMaintenanceAssociate.getEntityTrail();
-
-        List<EntityTrail> updatedTrail = new ArrayList<>(existingTrail);
-
-        updatedTrail.add(updateTrail);
+        SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(existingSiteMaintenanceAssociate.getId(), input.getUserId());
 
         // TODO: If the user updates the site role of the employee, then we will end up storing WHS Members and Site Maintenance Managers in the SiteMaintenanceAssociate repository.
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
-            existingSiteMaintenanceAssociate.getId(),
-            existingSiteMaintenanceAssociate.getCreatedAt(),
-            currentTime,
-            updatedTrail,
-            input.getUserId(),
-            existingSiteMaintenanceAssociate.getSiteRole(),
+            updatedSiteMaintenanceAssociate.getId(),
+            updatedSiteMaintenanceAssociate.getCreatedAt(),
+            updatedSiteMaintenanceAssociate.getUpdatedAt(),
+            updatedSiteMaintenanceAssociate.getEntityTrail(),
+            updatedSiteMaintenanceAssociate.getPublisherId(),
+            updatedSiteMaintenanceAssociate.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
             input.getEmail(),
             input.getPhone(),
-            existingSiteMaintenanceAssociate.getAuthToken(),
-            existingSiteMaintenanceAssociate.getHashPassword(),
+            updatedSiteMaintenanceAssociate.getAuthToken(),
+            updatedSiteMaintenanceAssociate.getHashPassword(),
             input.getSiteIds(),
-            existingSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
-            existingSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds()
+            updatedSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
+            updatedSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds()
         );
 
         try {
@@ -230,6 +220,8 @@ public class SiteMaintenanceAssociateService {
         LOGGER.info("Site maintenance associate: " + siteMaintenanceAssociateToDelete.toString() + " successfully fetched and deleted from site maintenance associate" +
                 " and user repositories");
         siteService.removeAssociatedSiteIdsFromSites(siteMaintenanceAssociateToDelete.getAssociatedSiteIds(), siteMaintenanceAssociateToDelete.getId(), userId);
+        siteMaintenanceManagerService.removeDeletedSiteMaintenanceAssociateFromManagerIdList(siteMaintenanceAssociateToDelete.getSiteMaintenanceManagerId(), userId);
+        riskAssessmentService.removeDeletedSiteMaintenanceAssociateFromRiskAssessmentSchedule(siteMaintenanceAssociateToDelete.getAssignedBuildingRiskAssessmentIds(), siteMaintenanceAssociateToDelete.getId(), userId);
         return siteMaintenanceAssociateToDelete;
     }
 

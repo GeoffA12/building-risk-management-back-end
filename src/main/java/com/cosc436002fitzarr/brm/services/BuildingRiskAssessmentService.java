@@ -5,6 +5,7 @@ import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessments.BuildingRiskAssessment;
 import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.CreateBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.UpdateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.repositories.BuildingRiskAssessmentRepository;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class BuildingRiskAssessmentService {
     public SiteMaintenanceManagerService siteMaintenanceManagerService;
     @Autowired
     public BuildingService buildingService;
+    @Autowired
+    public RiskAssessmentService riskAssessmentService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(BuildingRiskAssessmentService.class);
 
@@ -124,6 +127,7 @@ public class BuildingRiskAssessmentService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
         List<EntityTrail> updatedEntityTrail = existingAssessment.getEntityTrail();
+
         updatedEntityTrail.add(new EntityTrail(currentTime, publisherId, getUpdatedBuildingRiskAssessmentSystemComment()));
 
         existingAssessment.setEntityTrail(updatedEntityTrail);
@@ -152,18 +156,20 @@ public class BuildingRiskAssessmentService {
         return buildingRiskAssessmentToDelete;
     }
 
-    public void deleteBuildingRiskAssessments(List<String> buildingRiskAssessmentIds) {
-        for (String id : buildingRiskAssessmentIds) {
-            BuildingRiskAssessment existingBuildingRiskAssessment = checkBuildingRiskAssessmentExists(id);
+    // TODO: Need to remove all risk assessment schedules (with the corresponding BRA id) from a risk assessment which was attached to the deleted building risk assessment
+    public void deleteBuildingRiskAssessments(List<String> buildingRiskAssessmentIds, String publisherId) {
+        for (String buildingRiskAssessmentId : buildingRiskAssessmentIds) {
+            BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(buildingRiskAssessmentId);
 
             try {
-                buildingRiskAssessmentRepository.deleteById(existingBuildingRiskAssessment.getId());
-                LOGGER.info("Successfully deleted: " + existingBuildingRiskAssessment.toString() + " from the" +
-                        " building risk assessment repository");
+                buildingRiskAssessmentRepository.deleteById(buildingRiskAssessmentToDelete.getId());
+                LOGGER.info("Successfully deleted: " + buildingRiskAssessmentToDelete.toString() + " from the building risk assessment repository");
             } catch (Exception e) {
                 LOGGER.info(e.toString());
                 throw new RuntimeException(e);
             }
+            buildingService.removeBuildingRiskAssessmentFromBuilding(buildingRiskAssessmentToDelete.getBuildingId(), buildingRiskAssessmentToDelete.getId(), publisherId);
+            riskAssessmentService.deleteRiskAssessments(new DeleteRiskAssessmentsInput(buildingRiskAssessmentToDelete.getRiskAssessmentIds(), publisherId));
         }
     }
 

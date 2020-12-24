@@ -3,6 +3,7 @@ package com.cosc436002fitzarr.brm.controllers;
 import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.AttachRiskAssessmentsToBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.GetAllRiskAssessmentsBySiteInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.UpdateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.services.RiskAssessmentService;
@@ -57,10 +58,10 @@ public class RiskAssessmentController {
         return "Risk assessment schedules successfully added.";
     }
 
-    @PostMapping(value = "/removeRiskAssessmentSchedulesFromRiskAssessment", consumes = "application/json")
-    public String removeRiskAssessmentSchedulesFromRiskAssessment(@RequestBody AttachRiskAssessmentsToBuildingRiskAssessmentInput requestBody) {
+    @PostMapping(value = "/deleteRiskAssessments", consumes = "application/json")
+    public String deleteRiskAssessments(@RequestBody DeleteRiskAssessmentsInput requestBody) {
         LOGGER.info(requestBody.toString());
-        riskAssessmentService.removeRiskAssessmentSchedulesFromRiskAssessment(requestBody);
-        return "Risk assessment schedules successfully removed";
+        riskAssessmentService.deleteRiskAssessments(requestBody);
+        return "Risk assessments successfully deleted";
     }
 }

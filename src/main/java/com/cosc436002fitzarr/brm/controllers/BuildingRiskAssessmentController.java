@@ -1,9 +1,9 @@
 package com.cosc436002fitzarr.brm.controllers;
 
 import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.BuildingRiskAssessment;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.CreateBuildingRiskAssessmentInput;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.UpdateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.CreateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.UpdateBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.services.BuildingRiskAssessmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

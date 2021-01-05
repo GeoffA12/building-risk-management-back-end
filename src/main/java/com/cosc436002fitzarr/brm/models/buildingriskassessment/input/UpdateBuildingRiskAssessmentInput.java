@@ -1,4 +1,4 @@
-package com.cosc436002fitzarr.brm.models.buildingriskassessments.input;
+package com.cosc436002fitzarr.brm.models.buildingriskassessment.input;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,25 +9,19 @@ public class UpdateBuildingRiskAssessmentInput {
     private String id;
     private String publisherId;
     private List<String> riskAssessmentIds;
-    private List<String> siteMaintenanceAssociateIds;
     private String buildingId;
     private String title;
     private String description;
-    private Long workOrder;
 
     @JsonCreator
-    public UpdateBuildingRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId,
-                                             @JsonProperty List<String> riskAssessmentIds, @JsonProperty List<String> siteMaintenanceAssociateIds,
-                                             @JsonProperty String buildingId, @JsonProperty String title,
-                                             @JsonProperty String description, @JsonProperty Long workOrder) {
+    public UpdateBuildingRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId, @JsonProperty List<String> riskAssessmentIds,
+                                             @JsonProperty String buildingId, @JsonProperty String title, @JsonProperty String description) {
         this.id = id;
         this.publisherId = publisherId;
         this.riskAssessmentIds = riskAssessmentIds;
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
         this.buildingId = buildingId;
         this.title = title;
         this.description = description;
-        this.workOrder = workOrder;
     }
 
     public String getId() {
@@ -78,22 +72,6 @@ public class UpdateBuildingRiskAssessmentInput {
         this.description = description;
     }
 
-    public List<String> getSiteMaintenanceAssociateIds() {
-        return siteMaintenanceAssociateIds;
-    }
-
-    public void setSiteMaintenanceAssociateIds(List<String> siteMaintenanceAssociateIds) {
-        this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
-    }
-
-    public Long getWorkOrder() {
-        return workOrder;
-    }
-
-    public void setWorkOrder(Long workOrder) {
-        this.workOrder = workOrder;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,16 +80,14 @@ public class UpdateBuildingRiskAssessmentInput {
         return getId().equals(that.getId()) &&
                 getPublisherId().equals(that.getPublisherId()) &&
                 getRiskAssessmentIds().equals(that.getRiskAssessmentIds()) &&
-                getSiteMaintenanceAssociateIds().equals(that.getSiteMaintenanceAssociateIds()) &&
                 getBuildingId().equals(that.getBuildingId()) &&
                 getTitle().equals(that.getTitle()) &&
-                getDescription().equals(that.getDescription()) &&
-                getWorkOrder().equals(that.getWorkOrder());
+                getDescription().equals(that.getDescription());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPublisherId(), getRiskAssessmentIds(), getSiteMaintenanceAssociateIds(), getBuildingId(), getTitle(), getDescription(), getWorkOrder());
+        return Objects.hash(getId(), getPublisherId(), getRiskAssessmentIds(), getBuildingId(), getTitle(), getDescription());
     }
 
     @Override
@@ -120,11 +96,9 @@ public class UpdateBuildingRiskAssessmentInput {
                 "id='" + id + '\'' +
                 ", publisherId='" + publisherId + '\'' +
                 ", riskAssessmentIds=" + riskAssessmentIds +
-                ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 ", buildingId='" + buildingId + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", workOrder=" + workOrder +
                 '}';
     }
 }

@@ -2,9 +2,9 @@ package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.BuildingRiskAssessment;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.CreateBuildingRiskAssessmentInput;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.UpdateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.CreateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.UpdateBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.repositories.BuildingRiskAssessmentRepository;
@@ -17,10 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -137,8 +134,7 @@ public class BuildingRiskAssessmentService {
         return existingAssessment;
     }
 
-    // TODO: In this API you still have to update the pointers we have in risk assessment, building, and site maintenance associate ID. For example,
-    // TODO: If a building risk assessment is deleted, there is no way that the site maintenance associate will be assigned to risk assessments belonging to the building assessment
+    // TODO: This needs to be refactored so that we get a publisherID as input and use it in the risk assessment service and building service calls
     public BuildingRiskAssessment deleteBuildingRiskAssessment(String id) {
         BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(id);
 
@@ -153,10 +149,10 @@ public class BuildingRiskAssessmentService {
         String siteMaintenanceManagerToUpdateId = buildingRiskAssessmentToDelete.getPublisherId();
         siteMaintenanceManagerService.removeBuildingRiskAssessmentFromList(siteMaintenanceManagerToUpdateId, buildingRiskAssessmentToDelete.getId());
         buildingService.removeBuildingRiskAssessmentFromBuilding(buildingRiskAssessmentToDelete.getBuildingId(), buildingRiskAssessmentToDelete.getId(), siteMaintenanceManagerToUpdateId);
+        riskAssessmentService.deleteRiskAssessments(new DeleteRiskAssessmentsInput(buildingRiskAssessmentToDelete.getRiskAssessmentIds(), siteMaintenanceManagerToUpdateId));
         return buildingRiskAssessmentToDelete;
     }
 
-    // TODO: Need to remove all risk assessment schedules (with the corresponding BRA id) from a risk assessment which was attached to the deleted building risk assessment
     public void deleteBuildingRiskAssessments(List<String> buildingRiskAssessmentIds, String publisherId) {
         for (String buildingRiskAssessmentId : buildingRiskAssessmentIds) {
             BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(buildingRiskAssessmentId);

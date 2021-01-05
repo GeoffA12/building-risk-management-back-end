@@ -19,11 +19,11 @@ public class RiskAssessment implements Entity {
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
-    List<RiskAssessmentSchedule> riskAssessmentSchedules;
+    List<String> riskAssessmentScheduleIds;
 
     public RiskAssessment(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail,
                           String publisherId, String title, String taskDescription, List<Hazard> hazards,
-                          List<Screener> screeners, List<RiskAssessmentSchedule> riskAssessmentSchedules) {
+                          List<Screener> screeners, List<String> riskAssessmentScheduleIds) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -33,7 +33,7 @@ public class RiskAssessment implements Entity {
         this.taskDescription = taskDescription;
         this.hazards = hazards;
         this.screeners = screeners;
-        this.riskAssessmentSchedules = riskAssessmentSchedules;
+        this.riskAssessmentScheduleIds = riskAssessmentScheduleIds;
     }
 
     @Override
@@ -118,12 +118,12 @@ public class RiskAssessment implements Entity {
         this.screeners = screeners;
     }
 
-    public List<RiskAssessmentSchedule> getRiskAssessmentSchedules() {
-        return riskAssessmentSchedules;
+    public List<String> getRiskAssessmentScheduleIds() {
+        return riskAssessmentScheduleIds;
     }
 
-    public void setRiskAssessmentSchedules(List<RiskAssessmentSchedule> riskAssessmentSchedules) {
-        this.riskAssessmentSchedules = riskAssessmentSchedules;
+    public void setRiskAssessmentScheduleIds(List<String> riskAssessmentScheduleIds) {
+        this.riskAssessmentScheduleIds = riskAssessmentScheduleIds;
     }
 
     @Override
@@ -131,20 +131,12 @@ public class RiskAssessment implements Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RiskAssessment that = (RiskAssessment) o;
-        return getId().equals(that.getId()) && getCreatedAt().equals(that.getCreatedAt()) &&
-                getUpdatedAt().equals(that.getUpdatedAt()) &&
-                getEntityTrail().equals(that.getEntityTrail()) &&
-                getPublisherId().equals(that.getPublisherId()) &&
-                getTitle().equals(that.getTitle()) &&
-                getTaskDescription().equals(that.getTaskDescription()) &&
-                getHazards().equals(that.getHazards()) &&
-                getScreeners().equals(that.getScreeners()) &&
-                getRiskAssessmentSchedules().equals(that.getRiskAssessmentSchedules());
+        return getId().equals(that.getId()) && getCreatedAt().equals(that.getCreatedAt()) && getUpdatedAt().equals(that.getUpdatedAt()) && getEntityTrail().equals(that.getEntityTrail()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getTaskDescription().equals(that.getTaskDescription()) && getHazards().equals(that.getHazards()) && getScreeners().equals(that.getScreeners()) && getRiskAssessmentScheduleIds().equals(that.getRiskAssessmentScheduleIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getRiskAssessmentSchedules());
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getRiskAssessmentScheduleIds());
     }
 
     @Override
@@ -159,7 +151,7 @@ public class RiskAssessment implements Entity {
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +
                 ", screeners=" + screeners +
-                ", riskAssessmentSchedules=" + riskAssessmentSchedules +
+                ", riskAssessmentScheduleIds=" + riskAssessmentScheduleIds +
                 '}';
     }
 }

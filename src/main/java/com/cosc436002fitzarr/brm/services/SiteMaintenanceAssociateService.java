@@ -33,7 +33,7 @@ public class SiteMaintenanceAssociateService {
     @Autowired
     public SiteMaintenanceManagerService siteMaintenanceManagerService;
     @Autowired
-    public RiskAssessmentService riskAssessmentService;
+    public RiskAssessmentScheduleService riskAssessmentScheduleServiceService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteMaintenanceAssociateService.class);
 
@@ -50,7 +50,7 @@ public class SiteMaintenanceAssociateService {
         EntityTrail createdEntity = new EntityTrail(currentTime, id, getSiteMaintenanceAssociateCreatedSystemComment());
         entityTrail.add(createdEntity);
 
-        List<String> assignedBuildingRiskAssessmentIds = new ArrayList<>();
+        List<String> assignedRiskAssessmentScheduleIds = new ArrayList<>();
 
         SiteMaintenanceAssociate siteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
             id,
@@ -68,7 +68,7 @@ public class SiteMaintenanceAssociateService {
             hashedPassword,
             associatedSiteIds,
             input.getSiteMaintenanceManagerId(),
-            assignedBuildingRiskAssessmentIds
+            assignedRiskAssessmentScheduleIds
         );
 
         try {
@@ -142,7 +142,7 @@ public class SiteMaintenanceAssociateService {
             updatedSiteMaintenanceAssociate.getHashPassword(),
             input.getSiteIds(),
             updatedSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
-            updatedSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds()
+            updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds()
         );
 
         try {
@@ -167,16 +167,16 @@ public class SiteMaintenanceAssociateService {
         return potentialSiteMaintenanceAssociate.get();
     }
 
-    public void assignRiskAssessmentToSiteMaintenanceAssociate(String associateId, String riskAssessmentId, String publisherId) {
+    public void assignRiskAssessmentScheduleToSiteMaintenanceAssociate(String associateId, String riskAssessmentScheduleId, String publisherId) {
         SiteMaintenanceAssociate siteMaintenanceAssociateToUpdate = checkSiteMaintenanceAssociateExists(associateId);
 
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(siteMaintenanceAssociateToUpdate.getId(), publisherId);
 
-        List<String> existingAssignedRiskAssessments = updatedSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds();
+        List<String> existingAssignedRiskAssessmentSchedules = updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds();
 
-        existingAssignedRiskAssessments.add(riskAssessmentId);
+        existingAssignedRiskAssessmentSchedules.add(riskAssessmentScheduleId);
 
-        updatedSiteMaintenanceAssociate.setAssignedBuildingRiskAssessments(existingAssignedRiskAssessments);
+        updatedSiteMaintenanceAssociate.setAssignedRiskAssessmentScheduleIds(existingAssignedRiskAssessmentSchedules);
 
         try {
             siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
@@ -189,16 +189,16 @@ public class SiteMaintenanceAssociateService {
         }
     }
 
-    public void removeAssignedRiskAssessmentFromAssociate(String associateId, String riskAssessmentId, String publisherId) {
+    public void removeAssignedRiskAssessmentFromAssociate(String associateId, String riskAssessmentScheduleId, String publisherId) {
         SiteMaintenanceAssociate siteMaintenanceAssociateToUpdate = checkSiteMaintenanceAssociateExists(associateId);
 
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(siteMaintenanceAssociateToUpdate.getId(), publisherId);
 
-        List<String> existingAssignedRiskAssessments = updatedSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds();
+        List<String> existingAssignedRiskAssessmentScheduleIds = updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds();
 
-        existingAssignedRiskAssessments.remove(riskAssessmentId);
+        existingAssignedRiskAssessmentScheduleIds.remove(riskAssessmentScheduleId);
 
-        updatedSiteMaintenanceAssociate.setAssignedBuildingRiskAssessments(existingAssignedRiskAssessments);
+        updatedSiteMaintenanceAssociate.setAssignedRiskAssessmentScheduleIds(existingAssignedRiskAssessmentScheduleIds);
 
         try {
             siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
@@ -221,7 +221,7 @@ public class SiteMaintenanceAssociateService {
                 " and user repositories");
         siteService.removeAssociatedSiteIdsFromSites(siteMaintenanceAssociateToDelete.getAssociatedSiteIds(), siteMaintenanceAssociateToDelete.getId(), userId);
         siteMaintenanceManagerService.removeDeletedSiteMaintenanceAssociateFromManagerIdList(siteMaintenanceAssociateToDelete.getSiteMaintenanceManagerId(), userId);
-        riskAssessmentService.removeDeletedSiteMaintenanceAssociateFromRiskAssessmentSchedule(siteMaintenanceAssociateToDelete.getAssignedBuildingRiskAssessmentIds(), siteMaintenanceAssociateToDelete.getId(), userId);
+        riskAssessmentScheduleServiceService.removeDeletedSiteMaintenanceAssociateFromRiskAssessmentSchedules(siteMaintenanceAssociateToDelete.getAssignedRiskAssessmentScheduleIds(), siteMaintenanceAssociateToDelete.getId(), userId);
         return siteMaintenanceAssociateToDelete;
     }
 

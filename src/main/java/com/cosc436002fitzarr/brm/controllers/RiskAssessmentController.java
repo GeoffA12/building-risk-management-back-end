@@ -1,6 +1,5 @@
 package com.cosc436002fitzarr.brm.controllers;
 
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.AttachRiskAssessmentsToBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
@@ -49,13 +48,6 @@ public class RiskAssessmentController {
     public Map<String, Object> getRiskAssessmentsBySite(@RequestBody GetAllRiskAssessmentsBySiteInput requestBody) {
         LOGGER.info(requestBody.toString());
         return riskAssessmentService.getRiskAssessmentsBySite(requestBody);
-    }
-
-    @PostMapping(value = "/attachRiskAssessmentSchedulesToRiskAssessment", consumes = "application/json")
-    public String attachRiskAssessmentSchedulesToRiskAssessment(@RequestBody AttachRiskAssessmentsToBuildingRiskAssessmentInput requestBody) {
-        LOGGER.info(requestBody.toString());
-        riskAssessmentService.attachRiskAssessmentSchedulesToRiskAssessment(requestBody);
-        return "Risk assessment schedules successfully added.";
     }
 
     @PostMapping(value = "/deleteRiskAssessments", consumes = "application/json")

@@ -1,13 +1,8 @@
 package com.cosc436002fitzarr.brm.services;
 
 
-import com.cosc436002fitzarr.brm.enums.RiskLevel;
-import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.AttachRiskAssessmentsToBuildingRiskAssessmentInput;
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.input.RiskAssessmentAttachmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
-import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessmentSchedule;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.CreateRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.GetAllRiskAssessmentsBySiteInput;
@@ -24,10 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +31,8 @@ public class RiskAssessmentService {
     public WorkplaceHealthSafetyMemberService workplaceHealthSafetyMemberService;
     @Autowired
     public SiteMaintenanceAssociateService siteMaintenanceAssociateService;
+    @Autowired
+    public RiskAssessmentScheduleService riskAssessmentScheduleService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(RiskAssessmentService.class);
 
@@ -47,7 +41,7 @@ public class RiskAssessmentService {
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
         List<EntityTrail> entityTrail = new ArrayList<>();
         entityTrail.add(new EntityTrail(currentTime, input.getPublisherId(), getCreatedRiskAssessmentMessage()));
-        List<RiskAssessmentSchedule> riskAssessmentSchedules = new ArrayList<>();
+        List<String> riskAssessmentScheduleIds = new ArrayList<>();
 
         RiskAssessment riskAssessmentForPersistence = new RiskAssessment(
             id,
@@ -59,7 +53,7 @@ public class RiskAssessmentService {
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            riskAssessmentSchedules
+            riskAssessmentScheduleIds
         );
 
         try {
@@ -86,7 +80,7 @@ public class RiskAssessmentService {
             input.getTaskDescription(),
             input.getHazards(),
             input.getScreeners(),
-            input.getRiskAssessmentSchedules()
+            input.getRiskAssessmentScheduleIds()
         );
 
         try {
@@ -153,58 +147,35 @@ public class RiskAssessmentService {
         return riskAssessmentMapResponse;
     }
 
-    public void attachRiskAssessmentSchedulesToRiskAssessment(AttachRiskAssessmentsToBuildingRiskAssessmentInput input) {
-        for (RiskAssessmentAttachmentInput riskAssessmentAttachmentInput : input.getRiskAssessmentAttachmentInputList()) {
-            Set<String> siteMaintenanceAssociatesUpdated = new HashSet<>();
+    // Invoked when a new risk assessment schedule is persisted.
+    public void addRiskAssessmentScheduleToRiskAssessment(String riskAssessmentScheduleId, String riskAssessmentId, String publisherId) {
+        RiskAssessment existingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
 
-            RiskAssessment riskAssessmentToAttachNewBuildingRiskAssessment = checkRiskAssessmentExists(riskAssessmentAttachmentInput.getRiskAssessmentId());
+        RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(existingRiskAssessment.getId(), publisherId);
 
-            RiskAssessment updatedAssessmentForPersistence = getUpdatedRiskAssessment(riskAssessmentToAttachNewBuildingRiskAssessment.getId(), input.getPublisherId());
+        List<String> existingRiskAssessmentScheduleIdList = updatedRiskAssessment.getRiskAssessmentScheduleIds();
 
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(riskAssessmentAttachmentInput.getDueDate());
+        existingRiskAssessmentScheduleIdList.add(riskAssessmentScheduleId);
 
-            LocalDateTime dueDate = LocalDateTime.parse(riskAssessmentAttachmentInput.getDueDate(), dateTimeFormatter);
+        updatedRiskAssessment.setRiskAssessmentScheduleIds(existingRiskAssessmentScheduleIdList);
 
-            RiskAssessmentSchedule newAssessmentSchedule = new RiskAssessmentSchedule(
-                riskAssessmentAttachmentInput.getBuildingId(),
-                Status.IN_PROGRESS,
-                dueDate,
-                RiskLevel.EMPTY,
-                riskAssessmentAttachmentInput.getSiteMaintenanceAssociateIds(),
-                riskAssessmentAttachmentInput.getWorkOrder()
-            );
-
-            List<RiskAssessmentSchedule> updatedAssessmentScheduleList = updatedAssessmentForPersistence.getRiskAssessmentSchedules();
-
-            updatedAssessmentScheduleList.add(newAssessmentSchedule);
-
-            updatedAssessmentForPersistence.setRiskAssessmentSchedules(updatedAssessmentScheduleList);
-
-            try {
-                riskAssessmentRepository.save(updatedAssessmentForPersistence);
-                LOGGER.info("Risk assessment with id: " + updatedAssessmentForPersistence.toString() + " updated in " +
-                        "risk assessment repository");
-            } catch (Exception e) {
-                LOGGER.info(e.toString());
-                throw new RuntimeException(e);
-            }
-            for (String siteMaintenanceAssociateId : riskAssessmentAttachmentInput.getSiteMaintenanceAssociateIds()) {
-                // Prevent Duplicate risk assessment Id's from being stored in the same site maintenance associate 'assignedRiskAssessmentIds' list attribute.
-                // Ex: Jamie Collins has 2 risk assessment schedules which he's assigned to on this new risk assessment. Because we're looping through each
-                // schedule here, each schedule will only belong to one risk assessment. So we only need to update the site maintenance associate id List once.
-                if (!siteMaintenanceAssociatesUpdated.contains(siteMaintenanceAssociateId)) {
-                    siteMaintenanceAssociateService.assignRiskAssessmentToSiteMaintenanceAssociate(siteMaintenanceAssociateId, riskAssessmentAttachmentInput.getRiskAssessmentId(), input.getPublisherId());
-                    siteMaintenanceAssociatesUpdated.add(siteMaintenanceAssociateId);
-                }
-            }
+        try {
+            riskAssessmentRepository.save(updatedRiskAssessment);
+            LOGGER.info("Risk assessment: " + updatedRiskAssessment.toString() + " saved in risk assessment repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
         }
     }
 
     public RiskAssessment deleteRiskAssessment(String id, String publisherId) {
         RiskAssessment riskAssessmentToDelete = checkRiskAssessmentExists(id);
+        for (String riskAssessmentScheduleId : riskAssessmentToDelete.getRiskAssessmentScheduleIds()) {
+            riskAssessmentScheduleService.deleteRiskAssessmentSchedule(riskAssessmentScheduleId, publisherId);
+        }
+
         riskAssessmentRepository.deleteById(id);
         LOGGER.info("Risk assessment: " + riskAssessmentToDelete.toString() + " successfully fetched and deleted from risk assessment repository");
-        removeDeletedRiskAssessmentFromSiteMaintenanceAssociateSchedule(riskAssessmentToDelete.getRiskAssessmentSchedules(), riskAssessmentToDelete.getId(), publisherId);
         workplaceHealthSafetyMemberService.removeRiskAssessmentIdFromWorkplaceHealthSafetyMemberIdList(riskAssessmentToDelete.getId(), publisherId);
         return riskAssessmentToDelete;
     }
@@ -226,6 +197,10 @@ public class RiskAssessmentService {
         for (String riskAssessmentId : riskAssessmentIds) {
             RiskAssessment riskAssessmentToDelete = checkRiskAssessmentExists(riskAssessmentId);
 
+            for (String riskAssessmentScheduleId : riskAssessmentToDelete.getRiskAssessmentScheduleIds()) {
+                riskAssessmentScheduleService.deleteRiskAssessmentSchedule(riskAssessmentScheduleId, publisherId);
+            }
+
             try {
                 riskAssessmentRepository.deleteById(riskAssessmentToDelete.getId());
                 LOGGER.info("Risk assessment: " + riskAssessmentToDelete.toString() + " successfully fetched and deleted from risk assessment repository");
@@ -233,16 +208,26 @@ public class RiskAssessmentService {
                 LOGGER.info(e.toString());
                 throw new RuntimeException(e);
             }
-            removeDeletedRiskAssessmentFromSiteMaintenanceAssociateSchedule(riskAssessmentToDelete.getRiskAssessmentSchedules(), riskAssessmentToDelete.getId(), publisherId);
         }
     }
 
-    public void removeDeletedRiskAssessmentFromSiteMaintenanceAssociateSchedule(List<RiskAssessmentSchedule> schedules, String riskAssessmentToDeleteId, String publisherId) {
-        for (RiskAssessmentSchedule schedule : schedules) {
-            List<String> siteMaintenanceAssociatesAttachedToDeletedSchedule = schedule.getSiteMaintenanceAssociateIds();
-            for (String siteMaintenanceAssociateId : siteMaintenanceAssociatesAttachedToDeletedSchedule) {
-                siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentToDeleteId, publisherId);
-            }
+    public void removeDeletedRiskAssessmentScheduleFromRiskAssessment(String riskAssessmentId, String riskAssessmentScheduleId, String publisherId) {
+        RiskAssessment existingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
+
+        RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(existingRiskAssessment.getId(), publisherId);
+
+        List<String> updatedRiskAssessmentScheduleIds = new ArrayList<>(updatedRiskAssessment.getRiskAssessmentScheduleIds());
+
+        updatedRiskAssessmentScheduleIds.add(riskAssessmentScheduleId);
+
+        updatedRiskAssessment.setRiskAssessmentScheduleIds(updatedRiskAssessmentScheduleIds);
+
+        try {
+            riskAssessmentRepository.save(updatedRiskAssessment);
+            LOGGER.info("Risk assessment: " + updatedRiskAssessment.toString() + " updated and saved in risk assessment repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
         }
     }
 
@@ -258,30 +243,8 @@ public class RiskAssessmentService {
         return existingRiskAssessment;
     }
 
-    public void removeDeletedSiteMaintenanceAssociateFromRiskAssessmentSchedule(List<String> riskAssessmentIds, String deletedSiteMaintenanceAssociateId, String publisherId) {
-        for (String riskAssessmentId : riskAssessmentIds) {
-            RiskAssessment existingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
-
-            RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(existingRiskAssessment.getId(), publisherId);
-
-            List<RiskAssessmentSchedule> updatedRiskAssessmentRiskAssessmentSchedules = updatedRiskAssessment.getRiskAssessmentSchedules();
-
-            // TODO: Can use a query here instead. Review other delete user methods and update accordingly
-            for (RiskAssessmentSchedule riskAssessmentSchedule : updatedRiskAssessmentRiskAssessmentSchedules) {
-                List<String> siteMaintenanceAssociatesAttachedToSchedule = riskAssessmentSchedule.getSiteMaintenanceAssociateIds();
-                siteMaintenanceAssociatesAttachedToSchedule.removeAll(Collections.singleton(deletedSiteMaintenanceAssociateId));
-                riskAssessmentSchedule.setSiteMaintenanceAssociateIds(siteMaintenanceAssociatesAttachedToSchedule);
-            }
-
-            updatedRiskAssessment.setRiskAssessmentSchedules(updatedRiskAssessmentRiskAssessmentSchedules);
-            try {
-                riskAssessmentRepository.save(updatedRiskAssessment);
-                LOGGER.info("Risk assessment: " + updatedRiskAssessment.toString() + " updated in risk assessment repository");
-            } catch (Exception e) {
-                LOGGER.info(e.toString());
-                throw new RuntimeException(e);
-            }
-        }
+    public List<RiskAssessment> getAllRiskAssessmentsById(List<String> riskAssessmentIdList) {
+        return riskAssessmentRepository.findRiskAssessmentsById(riskAssessmentIdList);
     }
 
     public String getCreatedRiskAssessmentMessage() {

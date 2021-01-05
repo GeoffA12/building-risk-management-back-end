@@ -1,4 +1,4 @@
-package com.cosc436002fitzarr.brm.models.buildingriskassessments.input;
+package com.cosc436002fitzarr.brm.models.buildingriskassessment.input;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

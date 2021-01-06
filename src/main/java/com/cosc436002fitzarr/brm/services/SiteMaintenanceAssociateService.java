@@ -32,6 +32,8 @@ public class SiteMaintenanceAssociateService {
     public SiteService siteService;
     @Autowired
     public SiteMaintenanceManagerService siteMaintenanceManagerService;
+    @Autowired
+    public RiskAssessmentScheduleService riskAssessmentScheduleServiceService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteMaintenanceAssociateService.class);
 
@@ -48,7 +50,7 @@ public class SiteMaintenanceAssociateService {
         EntityTrail createdEntity = new EntityTrail(currentTime, id, getSiteMaintenanceAssociateCreatedSystemComment());
         entityTrail.add(createdEntity);
 
-        List<String> assignedBuildingRiskAssessmentIds = new ArrayList<>();
+        List<String> assignedRiskAssessmentScheduleIds = new ArrayList<>();
 
         SiteMaintenanceAssociate siteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
             id,
@@ -66,7 +68,7 @@ public class SiteMaintenanceAssociateService {
             hashedPassword,
             associatedSiteIds,
             input.getSiteMaintenanceManagerId(),
-            assignedBuildingRiskAssessmentIds
+            assignedRiskAssessmentScheduleIds
         );
 
         try {
@@ -100,47 +102,47 @@ public class SiteMaintenanceAssociateService {
         return siteMaintenanceAssociateRepository.getSiteMaintenanceAssociatesBySite(input.getAssociatedSiteIds());
     }
 
-    public SiteMaintenanceAssociate updateSiteMaintenanceAssociate(UpdateUserInput input) {
-        Optional<SiteMaintenanceAssociate> potentialSiteMaintenanceAssociate;
-
-        potentialSiteMaintenanceAssociate = siteMaintenanceAssociateRepository.findById(input.getId());
-        if (!potentialSiteMaintenanceAssociate.isPresent()) {
-            throw new EntityNotFoundException("Site Maintenance Associate with id: " + input.getId() + " not found in site maintenance repository!");
-        }
-
-        SiteMaintenanceAssociate existingSiteMaintenanceAssociate = potentialSiteMaintenanceAssociate.get();
-        LOGGER.info("Successfully retrieved site maintenance associate user: " + existingSiteMaintenanceAssociate.toString() + " out of repository to update.");
+    public SiteMaintenanceAssociate getUpdatedSiteMaintenanceAssociate(String id, String userId) {
+        SiteMaintenanceAssociate existingSiteMaintenanceAssociate = checkSiteMaintenanceAssociateExists(id);
 
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
-        // TODO: Refactor the UpdateUserInput class so that a publisherId in the input object. Otherwise, we have no way of knowing the ID of whoever is updating this
-        // specific site admin and can't update the Entity Trail accordingly.
-        EntityTrail updateTrail = new EntityTrail(currentTime, input.getUserId(), getSiteMaintenanceAssociateUpdatedSystemComment());
+        EntityTrail updatedTrail = new EntityTrail(currentTime, userId, getSiteMaintenanceAssociateUpdatedSystemComment());
 
         List<EntityTrail> existingTrail = existingSiteMaintenanceAssociate.getEntityTrail();
 
-        List<EntityTrail> updatedTrail = new ArrayList<>(existingTrail);
+        existingTrail.add(updatedTrail);
 
-        updatedTrail.add(updateTrail);
+        existingSiteMaintenanceAssociate.setEntityTrail(existingTrail);
+
+        existingSiteMaintenanceAssociate.setUpdatedAt(currentTime);
+
+        return existingSiteMaintenanceAssociate;
+    }
+
+    public SiteMaintenanceAssociate updateSiteMaintenanceAssociate(UpdateUserInput input) {
+        SiteMaintenanceAssociate existingSiteMaintenanceAssociate = checkSiteMaintenanceAssociateExists(input.getId());
+
+        SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(existingSiteMaintenanceAssociate.getId(), input.getUserId());
 
         // TODO: If the user updates the site role of the employee, then we will end up storing WHS Members and Site Maintenance Managers in the SiteMaintenanceAssociate repository.
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
-            existingSiteMaintenanceAssociate.getId(),
-            currentTime,
-            existingSiteMaintenanceAssociate.getCreatedAt(),
-            updatedTrail,
-            input.getUserId(),
-            existingSiteMaintenanceAssociate.getSiteRole(),
+            updatedSiteMaintenanceAssociate.getId(),
+            updatedSiteMaintenanceAssociate.getCreatedAt(),
+            updatedSiteMaintenanceAssociate.getUpdatedAt(),
+            updatedSiteMaintenanceAssociate.getEntityTrail(),
+            updatedSiteMaintenanceAssociate.getPublisherId(),
+            updatedSiteMaintenanceAssociate.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
             input.getEmail(),
             input.getPhone(),
-            existingSiteMaintenanceAssociate.getAuthToken(),
-            existingSiteMaintenanceAssociate.getHashPassword(),
+            updatedSiteMaintenanceAssociate.getAuthToken(),
+            updatedSiteMaintenanceAssociate.getHashPassword(),
             input.getSiteIds(),
-            existingSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
-            existingSiteMaintenanceAssociate.getAssignedBuildingRiskAssessmentIds()
+            updatedSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
+            updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds()
         );
 
         try {
@@ -155,23 +157,72 @@ public class SiteMaintenanceAssociateService {
         return updatedSiteMaintenanceAssociateForPersistence;
     }
 
-    public SiteMaintenanceAssociate deleteSiteMaintenanceAssociate(String id, String userId) {
-        UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
+    public SiteMaintenanceAssociate checkSiteMaintenanceAssociateExists(String id) {
         Optional<SiteMaintenanceAssociate> potentialSiteMaintenanceAssociate = siteMaintenanceAssociateRepository.findById(id);
-        Boolean siteMaintenanceAssociatePresent = potentialSiteMaintenanceAssociate.isPresent();
-        if (!siteMaintenanceAssociatePresent) {
+        if (!potentialSiteMaintenanceAssociate.isPresent()) {
             LOGGER.info("Site maintenance associate with id: " + id + " not found in the site maintenance associate repository!");
             throw new EntityNotFoundException("Site maintenance associate with id: " + id + " not found in the site maintenance associate repository!");
         }
-        else {
-            siteMaintenanceAssociateRepository.deleteById(id);
-            userRepository.deleteById(id);
-            LOGGER.info("Site maintenance associate: " + potentialSiteMaintenanceAssociate.get().toString() + " successfully fetched and deleted from site maintenance associate" +
-                    " and user repositories");
-            SiteMaintenanceAssociate deletedSiteMaintenanceAssociate = potentialSiteMaintenanceAssociate.get();
-            siteService.removeAssociatedSiteIdsFromSites(deletedSiteMaintenanceAssociate.getAssociatedSiteIds(), deletedSiteMaintenanceAssociate.getId(), userId);
-            return deletedSiteMaintenanceAssociate;
+        LOGGER.info("Site maintenance associate with id: " + id + " successfully retrieved from site maintenance associate repository");
+        return potentialSiteMaintenanceAssociate.get();
+    }
+
+    public void assignRiskAssessmentScheduleToSiteMaintenanceAssociate(String associateId, String riskAssessmentScheduleId, String publisherId) {
+        SiteMaintenanceAssociate siteMaintenanceAssociateToUpdate = checkSiteMaintenanceAssociateExists(associateId);
+
+        SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(siteMaintenanceAssociateToUpdate.getId(), publisherId);
+
+        List<String> existingAssignedRiskAssessmentSchedules = updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds();
+
+        existingAssignedRiskAssessmentSchedules.add(riskAssessmentScheduleId);
+
+        updatedSiteMaintenanceAssociate.setAssignedRiskAssessmentScheduleIds(existingAssignedRiskAssessmentSchedules);
+
+        try {
+            siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
+            userRepository.save(updatedSiteMaintenanceAssociate);
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in user repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
         }
+    }
+
+    public void removeAssignedRiskAssessmentFromAssociate(String associateId, String riskAssessmentScheduleId, String publisherId) {
+        SiteMaintenanceAssociate siteMaintenanceAssociateToUpdate = checkSiteMaintenanceAssociateExists(associateId);
+
+        SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(siteMaintenanceAssociateToUpdate.getId(), publisherId);
+
+        List<String> existingAssignedRiskAssessmentScheduleIds = updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds();
+
+        existingAssignedRiskAssessmentScheduleIds.remove(riskAssessmentScheduleId);
+
+        updatedSiteMaintenanceAssociate.setAssignedRiskAssessmentScheduleIds(existingAssignedRiskAssessmentScheduleIds);
+
+        try {
+            siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
+            userRepository.save(updatedSiteMaintenanceAssociate);
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in user repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public SiteMaintenanceAssociate deleteSiteMaintenanceAssociate(String id, String userId) {
+        UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
+        SiteMaintenanceAssociate siteMaintenanceAssociateToDelete = checkSiteMaintenanceAssociateExists(id);
+
+        siteMaintenanceAssociateRepository.deleteById(siteMaintenanceAssociateToDelete.getId());
+        userRepository.deleteById(siteMaintenanceAssociateToDelete.getId());
+        LOGGER.info("Site maintenance associate: " + siteMaintenanceAssociateToDelete.toString() + " successfully fetched and deleted from site maintenance associate" +
+                " and user repositories");
+        siteService.removeAssociatedSiteIdsFromSites(siteMaintenanceAssociateToDelete.getAssociatedSiteIds(), siteMaintenanceAssociateToDelete.getId(), userId);
+        siteMaintenanceManagerService.removeDeletedSiteMaintenanceAssociateFromManagerIdList(siteMaintenanceAssociateToDelete.getSiteMaintenanceManagerId(), userId);
+        riskAssessmentScheduleServiceService.removeDeletedSiteMaintenanceAssociateFromRiskAssessmentSchedules(siteMaintenanceAssociateToDelete.getAssignedRiskAssessmentScheduleIds(), siteMaintenanceAssociateToDelete.getId(), userId);
+        return siteMaintenanceAssociateToDelete;
     }
 
     public String getSiteMaintenanceAssociateCreatedSystemComment() {

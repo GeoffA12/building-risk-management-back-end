@@ -15,17 +15,20 @@ public class UpdateRiskAssessmentInput {
     private String taskDescription;
     private List<Hazard> hazards;
     private List<Screener> screeners;
+    private List<String> riskAssessmentScheduleIds;
 
     @JsonCreator
     public UpdateRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId,
                                      @JsonProperty String title, @JsonProperty String taskDescription,
-                                     @JsonProperty List<Hazard> hazards, @JsonProperty List<Screener> screeners) {
+                                     @JsonProperty List<Hazard> hazards, @JsonProperty List<Screener> screeners,
+                                     @JsonProperty List<String> riskAssessmentScheduleIds) {
         this.id = id;
         this.publisherId = publisherId;
         this.title = title;
         this.taskDescription = taskDescription;
         this.hazards = hazards;
         this.screeners = screeners;
+        this.riskAssessmentScheduleIds = riskAssessmentScheduleIds;
     }
 
     public String getId() {
@@ -76,22 +79,25 @@ public class UpdateRiskAssessmentInput {
         this.screeners = screeners;
     }
 
+    public List<String> getRiskAssessmentScheduleIds() {
+        return riskAssessmentScheduleIds;
+    }
+
+    public void setRiskAssessmentScheduleIds(List<String> riskAssessmentScheduleIds) {
+        this.riskAssessmentScheduleIds = riskAssessmentScheduleIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateRiskAssessmentInput that = (UpdateRiskAssessmentInput) o;
-        return Objects.equals(getId(), that.getId()) &&
-                Objects.equals(getPublisherId(), that.getPublisherId()) &&
-                Objects.equals(getTitle(), that.getTitle()) &&
-                Objects.equals(getTaskDescription(), that.getTaskDescription()) &&
-                Objects.equals(getHazards(), that.getHazards()) &&
-                Objects.equals(getScreeners(), that.getScreeners());
+        return getId().equals(that.getId()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getTaskDescription().equals(that.getTaskDescription()) && getHazards().equals(that.getHazards()) && getScreeners().equals(that.getScreeners()) && getRiskAssessmentScheduleIds().equals(that.getRiskAssessmentScheduleIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners());
+        return Objects.hash(getId(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getRiskAssessmentScheduleIds());
     }
 
     @Override
@@ -103,6 +109,7 @@ public class UpdateRiskAssessmentInput {
                 ", taskDescription='" + taskDescription + '\'' +
                 ", hazards=" + hazards +
                 ", screeners=" + screeners +
+                ", riskAssessmentScheduleIds=" + riskAssessmentScheduleIds +
                 '}';
     }
 }

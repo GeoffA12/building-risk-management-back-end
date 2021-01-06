@@ -37,15 +37,15 @@ public class BuildingController {
         return buildingService.getById(id);
     }
 
+    @DeleteMapping(value = "/deleteBuilding")
+    public String deleteBuilding(@RequestParam(name="id") String id, @RequestParam(name = "publisherId") String publisherId) {
+        Building deletedBuilding = buildingService.deleteBuilding(id, publisherId);
+        return "Deleted: " + deletedBuilding.toString() + " from building repository";
+    }
+
     @RequestMapping("/getBuildingsBySite")
     public List<Building> getAllBuildingsBySite(@RequestBody GetEntityBySiteInput input) {
         LOGGER.info(input.toString());
         return buildingService.getAllBuildingsBySite(input);
-    }
-
-    @DeleteMapping(value = "/deleteBuilding")
-    public String deleteBuilding(@RequestParam(name="id") String id) {
-        Building deletedBuilding = buildingService.deleteBuilding(id);
-        return "Deleted: " + deletedBuilding.toString() + " from building repository";
     }
 }

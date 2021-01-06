@@ -1,4 +1,4 @@
-package com.cosc436002fitzarr.brm.models.buildingriskassessments;
+package com.cosc436002fitzarr.brm.models.buildingriskassessment;
 
 import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@Document(collection = "buildingriskassessments")
+@Document(collection = "buildingriskassessment")
 public class BuildingRiskAssessment implements Entity {
     private String id;
     private LocalDateTime createdAt;

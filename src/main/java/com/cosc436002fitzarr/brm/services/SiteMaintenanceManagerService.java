@@ -93,13 +93,7 @@ public class SiteMaintenanceManagerService {
     }
 
     public SiteMaintenanceManager getUpdatedSiteMaintenanceManager(String id, String publisherId) {
-        Optional<SiteMaintenanceManager> potentialSiteMaintenanceManager = siteMaintenanceManagerRepository.findById(id);
-        if (!potentialSiteMaintenanceManager.isPresent()) {
-            throw new EntityNotFoundException("Site Maintenance Manager with id: " + id + " not found in site maintenance manager repository!");
-        }
-
-        SiteMaintenanceManager existingSiteMaintenanceManager = potentialSiteMaintenanceManager.get();
-        LOGGER.info("Successfully retrieved site maintenance manager user: " + existingSiteMaintenanceManager.toString() + " out of repository to update.");
+        SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(id);
 
         LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
@@ -115,31 +109,32 @@ public class SiteMaintenanceManagerService {
 
         existingSiteMaintenanceManager.setEntityTrail(updatedTrail);
 
+        existingSiteMaintenanceManager.setUpdatedAt(currentTime);
+
         return existingSiteMaintenanceManager;
     }
 
     public SiteMaintenanceManager updateSiteMaintenanceManager(UpdateUserInput input) {
-        SiteMaintenanceManager existingSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(input.getId(), input.getUserId());
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+        SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(input.getId(), input.getUserId());
 
         SiteMaintenanceManager updatedSiteMaintenanceManagerForPersistence = new SiteMaintenanceManager(
-            existingSiteMaintenanceManager.getId(),
-            currentTime,
-            existingSiteMaintenanceManager.getCreatedAt(),
-            existingSiteMaintenanceManager.getEntityTrail(),
-            input.getUserId(),
-            existingSiteMaintenanceManager.getSiteRole(),
+            updatedSiteMaintenanceManager.getId(),
+            updatedSiteMaintenanceManager.getCreatedAt(),
+            updatedSiteMaintenanceManager.getUpdatedAt(),
+            updatedSiteMaintenanceManager.getEntityTrail(),
+            updatedSiteMaintenanceManager.getPublisherId(),
+            updatedSiteMaintenanceManager.getSiteRole(),
             input.getFirstName(),
             input.getLastName(),
             input.getUsername(),
             input.getEmail(),
             input.getPhone(),
-            existingSiteMaintenanceManager.getAuthToken(),
-            existingSiteMaintenanceManager.getHashPassword(),
+            updatedSiteMaintenanceManager.getAuthToken(),
+            updatedSiteMaintenanceManager.getHashPassword(),
             input.getSiteIds(),
-            existingSiteMaintenanceManager.getSiteMaintenanceAssociateIds(),
-            existingSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled(),
-            existingSiteMaintenanceManager.getBuildingIdsFiled()
+            updatedSiteMaintenanceManager.getSiteMaintenanceAssociateIds(),
+            updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled(),
+            updatedSiteMaintenanceManager.getBuildingIdsFiled()
         );
 
         try {
@@ -156,37 +151,28 @@ public class SiteMaintenanceManagerService {
 
     public SiteMaintenanceManager deleteSiteMaintenanceManager(String id, String userId) {
         UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
-        Optional<SiteMaintenanceManager> potentialSiteMaintenanceManager = siteMaintenanceManagerRepository.findById(id);
-        Boolean siteMaintenanceAssociatePresent = potentialSiteMaintenanceManager.isPresent();
-        if (!siteMaintenanceAssociatePresent) {
-            LOGGER.info("Site maintenance manager with id: " + id + " not found in the site maintenance manager repository!");
-            throw new EntityNotFoundException("Site maintenance manager with id: " + id + " not found in the site maintenance manager repository!");
-        }
-        else {
-            siteMaintenanceManagerRepository.deleteById(id);
-            userRepository.deleteById(id);
-            LOGGER.info("Site maintenance manager: " + potentialSiteMaintenanceManager.get().toString() + " successfully fetched and deleted from site maintenance manager" +
-                    " and user repositories");
-            SiteMaintenanceManager siteMaintenanceManagerToDelete = potentialSiteMaintenanceManager.get();
-            List<String> deletedAssociatedSiteIds = siteMaintenanceManagerToDelete.getAssociatedSiteIds();
-            siteService.removeAssociatedSiteIdsFromSites(deletedAssociatedSiteIds, siteMaintenanceManagerToDelete.getId(), userId);
-            buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled());
-            return siteMaintenanceManagerToDelete;
-        }
+        SiteMaintenanceManager siteMaintenanceManagerToDelete = checkSiteMaintenanceManagerExists(id);
+
+        siteMaintenanceManagerRepository.deleteById(siteMaintenanceManagerToDelete.getId());
+        userRepository.deleteById(id);
+        LOGGER.info("Site maintenance manager: " + siteMaintenanceManagerToDelete.toString() + " successfully fetched and deleted from site maintenance manager" +
+                " and user repositories");
+
+        List<String> deletedAssociatedSiteIds = siteMaintenanceManagerToDelete.getAssociatedSiteIds();
+        siteService.removeAssociatedSiteIdsFromSites(deletedAssociatedSiteIds, siteMaintenanceManagerToDelete.getId(), userId);
+        buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled(), userId);
+        return siteMaintenanceManagerToDelete;
+
     }
 
     public void attachSiteMaintenanceAssociateIdToSiteMaintenanceManagerIdList(String siteMaintenanceAssociateId, String existingSiteMaintenanceManagerId) {
         SiteMaintenanceManager existingSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(existingSiteMaintenanceManagerId, siteMaintenanceAssociateId);
-
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
 
         List<String> updatedSiteMaintenanceAssociateIds = new ArrayList<>(existingSiteMaintenanceManager.getSiteMaintenanceAssociateIds());
 
         updatedSiteMaintenanceAssociateIds.add(siteMaintenanceAssociateId);
 
         existingSiteMaintenanceManager.setSiteMaintenanceAssociateIds(updatedSiteMaintenanceAssociateIds);
-
-        existingSiteMaintenanceManager.setUpdatedAt(currentTime);
 
         try {
             siteMaintenanceManagerRepository.save(existingSiteMaintenanceManager);
@@ -199,13 +185,17 @@ public class SiteMaintenanceManagerService {
         }
     }
 
-    public void attachNewBuildingRiskAssessmentToSiteMaintenanceManager(String maintenanceManagerId, String buildingRiskAssessmentId) {
-        Optional<SiteMaintenanceManager> potentialSiteMaintenanceManager = siteMaintenanceManagerRepository.findById(maintenanceManagerId);
+    public SiteMaintenanceManager checkSiteMaintenanceManagerExists(String id) {
+        Optional<SiteMaintenanceManager> potentialSiteMaintenanceManager = siteMaintenanceManagerRepository.findById(id);
         if (!potentialSiteMaintenanceManager.isPresent()) {
-            LOGGER.info("Site maintenance manager with id: " + maintenanceManagerId + " not found in the site maintenance manager repository");
-            throw new EntityNotFoundException("Site maintenance manager with id: " + maintenanceManagerId + " not found in the site maintenance manager repository");
+            LOGGER.info("Site maintenance manager with id: " + id + " not found in site maintenance manager repository");
+            throw new EntityNotFoundException("Site maintenance manager with id: " + id + " not found in site maintenance manager repository");
         }
-        SiteMaintenanceManager existingSiteMaintenanceManager = potentialSiteMaintenanceManager.get();
+        return potentialSiteMaintenanceManager.get();
+    }
+
+    public void attachNewBuildingRiskAssessmentToSiteMaintenanceManager(String maintenanceManagerId, String buildingRiskAssessmentId) {
+        SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(maintenanceManagerId);
 
         SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(existingSiteMaintenanceManager.getId(), maintenanceManagerId);
 
@@ -235,10 +225,53 @@ public class SiteMaintenanceManagerService {
         }
     }
 
+    public void removeBuildingRiskAssessmentFromList(String siteMaintenanceManagerId, String buildingRiskAssessmentId) {
+        SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(siteMaintenanceManagerId);
+
+        SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(existingSiteMaintenanceManager.getId(), siteMaintenanceManagerId);
+
+        List<String> buildingRiskAssessments = updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled();
+
+        buildingRiskAssessments.remove(buildingRiskAssessmentId);
+
+        updatedSiteMaintenanceManager.setBuildingRiskAssessmentIdsFiled(buildingRiskAssessments);
+
+        try {
+            siteMaintenanceManagerRepository.save(updatedSiteMaintenanceManager);
+            LOGGER.info("Site maintenance manager: " + existingSiteMaintenanceManager.toString() + " saved in site maintenance manager repository");
+            userRepository.save(updatedSiteMaintenanceManager);
+            LOGGER.info("Site maintenance manager: " + existingSiteMaintenanceManager.toString() + " saved in site maintenance manager repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<SiteMaintenanceManager> getSiteMaintenanceManagersBySite(List<String> associatedSiteIds) {
         return siteMaintenanceManagerRepository.getSiteMaintenanceManagersBySite(associatedSiteIds);
     }
 
+    public void removeDeletedSiteMaintenanceAssociateFromManagerIdList(String siteMaintenanceManagerId, String publisherId) {
+        SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(siteMaintenanceManagerId);
+
+        SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(existingSiteMaintenanceManager.getId(), publisherId);
+
+        List<String> existingMaintenanceAssociatesManagedList = updatedSiteMaintenanceManager.getSiteMaintenanceAssociateIds();
+
+        existingMaintenanceAssociatesManagedList.remove(siteMaintenanceManagerId);
+
+        updatedSiteMaintenanceManager.setSiteMaintenanceAssociateIds(existingMaintenanceAssociatesManagedList);
+
+        try {
+            siteMaintenanceManagerRepository.save(updatedSiteMaintenanceManager);
+            LOGGER.info("Site maintenance manager: " + existingSiteMaintenanceManager.toString() + " saved in site maintenance manager repository");
+            userRepository.save(updatedSiteMaintenanceManager);
+            LOGGER.info("Site maintenance manager: " + existingSiteMaintenanceManager.toString() + " saved in site maintenance manager repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+    }
 
     public String getCreatedSiteMaintenanceManagerSystemComment() {
         return "CREATED SITE MAINTENANCE MANAGER";

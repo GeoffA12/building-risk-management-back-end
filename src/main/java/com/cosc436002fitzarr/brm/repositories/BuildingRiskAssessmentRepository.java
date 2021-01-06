@@ -1,6 +1,6 @@
 package com.cosc436002fitzarr.brm.repositories;
 
-import com.cosc436002fitzarr.brm.models.buildingriskassessments.BuildingRiskAssessment;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

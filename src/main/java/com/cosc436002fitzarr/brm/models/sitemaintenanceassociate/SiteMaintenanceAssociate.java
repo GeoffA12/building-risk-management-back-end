@@ -13,14 +13,14 @@ import java.util.Objects;
 @Document(collection = "sitemaintenanceassociate")
 public class SiteMaintenanceAssociate extends User implements Entity {
     private String siteMaintenanceManagerId;
-    private List<String> assignedBuildingRiskAssessmentIds;
+    private List<String> assignedRiskAssessmentScheduleIds;
 
     public SiteMaintenanceAssociate(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail, String publisherId,
     SiteRole siteRole, String firstName, String lastName, String username, String email, String phone, String authToken,
-    String hashPassword, List<String> associatedSiteIds, String siteMaintenanceManagerId, List<String> assignedBuildingRiskAssessmentIds) {
+    String hashPassword, List<String> associatedSiteIds, String siteMaintenanceManagerId, List<String> assignedRiskAssessmentScheduleIds) {
         super(id, createdAt, updatedAt, entityTrail, publisherId, siteRole, firstName, lastName, username, email, phone, authToken, hashPassword, associatedSiteIds);
         this.siteMaintenanceManagerId = siteMaintenanceManagerId;
-        this.assignedBuildingRiskAssessmentIds = assignedBuildingRiskAssessmentIds;
+        this.assignedRiskAssessmentScheduleIds = assignedRiskAssessmentScheduleIds;
     }
 
     public String getSiteMaintenanceManagerId() {
@@ -31,12 +31,12 @@ public class SiteMaintenanceAssociate extends User implements Entity {
         this.siteMaintenanceManagerId = siteMaintenanceManagerId;
     }
 
-    public List<String> getAssignedBuildingRiskAssessmentIds() {
-        return assignedBuildingRiskAssessmentIds;
+    public List<String> getAssignedRiskAssessmentScheduleIds() {
+        return assignedRiskAssessmentScheduleIds;
     }
 
-    public void setAssignedBuildingRiskAssessments(List<String> assignedBuildingRiskAssessments) {
-        this.assignedBuildingRiskAssessmentIds = assignedBuildingRiskAssessments;
+    public void setAssignedRiskAssessmentScheduleIds(List<String> assignedRiskAssessmentScheduleIds) {
+        this.assignedRiskAssessmentScheduleIds = assignedRiskAssessmentScheduleIds;
     }
 
     @Override
@@ -45,22 +45,20 @@ public class SiteMaintenanceAssociate extends User implements Entity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         SiteMaintenanceAssociate that = (SiteMaintenanceAssociate) o;
-        return getSiteMaintenanceManagerId().equals(that.getSiteMaintenanceManagerId()) &&
-                getAssignedBuildingRiskAssessmentIds().equals(that.getAssignedBuildingRiskAssessmentIds());
+        return getSiteMaintenanceManagerId().equals(that.getSiteMaintenanceManagerId()) && getAssignedRiskAssessmentScheduleIds().equals(that.getAssignedRiskAssessmentScheduleIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getSiteMaintenanceManagerId(), getAssignedBuildingRiskAssessmentIds());
+        return Objects.hash(super.hashCode(), getSiteMaintenanceManagerId(), getAssignedRiskAssessmentScheduleIds());
     }
 
-    // TODO: Use super.toString() and append this to the toString() in all user subclasses.
     @Override
     public String toString() {
         return "SiteMaintenanceAssociate{" +
                 super.toString() +
                 "siteMaintenanceManagerId='" + siteMaintenanceManagerId + '\'' +
-                ", assignedBuildingRiskAssessments=" + assignedBuildingRiskAssessmentIds +
+                ", assignedRiskAssessmentScheduleIds=" + assignedRiskAssessmentScheduleIds +
                 '}';
     }
 }

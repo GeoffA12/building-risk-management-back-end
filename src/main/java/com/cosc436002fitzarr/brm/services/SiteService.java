@@ -118,14 +118,12 @@ public class SiteService {
     }
 
     public Site updateSite(UpdateSiteInput input) {
-        LocalDateTime currentTime = LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-
         Site updatedSite = getUpdatedSite(input.getId(), input.getUserId());
 
         Site updatedSiteForPersistence = new Site(
             updatedSite.getId(),
             updatedSite.getCreatedAt(),
-            currentTime,
+            updatedSite.getUpdatedAt(),
             updatedSite.getEntityTrail(),
             updatedSite.getPublisherId(),
             input.getSiteName(),
@@ -165,6 +163,8 @@ public class SiteService {
 
         existingSite.setEntityTrail(updatedTrail);
 
+        existingSite.setUpdatedAt(currentTime);
+
         return existingSite;
     }
 
@@ -190,15 +190,15 @@ public class SiteService {
             newUserIdList.add(userId);
 
             Site updatedSiteForPersistence = new Site(
-                    updatedSite.getId(),
-                    updatedSite.getCreatedAt(),
-                    currentTime,
-                    updatedSite.getEntityTrail(),
-                    updatedSite.getPublisherId(),
-                    updatedSite.getSiteName(),
-                    updatedSite.getSiteCode(),
-                    updatedSite.getAddress(),
-                    newUserIdList
+                updatedSite.getId(),
+                updatedSite.getCreatedAt(),
+                currentTime,
+                updatedSite.getEntityTrail(),
+                updatedSite.getPublisherId(),
+                updatedSite.getSiteName(),
+                updatedSite.getSiteCode(),
+                updatedSite.getAddress(),
+                newUserIdList
             );
 
             try {

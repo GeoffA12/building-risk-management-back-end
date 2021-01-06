@@ -182,7 +182,7 @@ public class SiteMaintenanceAssociateService {
             siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
             LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
             userRepository.save(updatedSiteMaintenanceAssociate);
-            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in user repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
@@ -204,7 +204,7 @@ public class SiteMaintenanceAssociateService {
             siteMaintenanceAssociateRepository.save(updatedSiteMaintenanceAssociate);
             LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
             userRepository.save(updatedSiteMaintenanceAssociate);
-            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in site maintenance associate repository");
+            LOGGER.info("Site maintenance associate: " + updatedSiteMaintenanceAssociate.toString() + " saved in user repository");
         } catch (Exception e) {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);

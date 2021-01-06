@@ -3,6 +3,7 @@ package com.cosc436002fitzarr.brm.controllers;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.CreateRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetBulkRiskAssessmentScheduleInput;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.UpdateRiskAssessmentScheduleInput;
 import com.cosc436002fitzarr.brm.services.RiskAssessmentScheduleService;
 import org.slf4j.Logger;
@@ -26,8 +27,8 @@ public class RiskAssessmentScheduleController {
     }
 
     @GetMapping(value = "/getRiskAssessmentScheduleById")
-    public RiskAssessmentSchedule getRiskAssessmentScheduleById(@RequestParam(name = "buildingRiskAssessmentId") String buildingRiskAssessmentId) {
-        return riskAssessmentScheduleService.getById(buildingRiskAssessmentId);
+    public RiskAssessmentSchedule getRiskAssessmentScheduleById(@RequestParam(name = "id") String id) {
+        return riskAssessmentScheduleService.getById(id);
     }
 
     @RequestMapping(value = "/updateRiskAssessmentSchedule", consumes = "application/json", produces = "application/json")
@@ -37,8 +38,8 @@ public class RiskAssessmentScheduleController {
     }
 
     @DeleteMapping(value = "/deleteRiskAssessmentSchedule")
-    public String deleteRiskAssessmentSchedule(@RequestParam(name = "buildingRiskAssessmentId") String buildingRiskAssessmentId, @RequestParam(name = "publisherId") String publisherId) {
-        RiskAssessmentSchedule deletedRiskAssessmentSchedule = riskAssessmentScheduleService.deleteRiskAssessmentSchedule(buildingRiskAssessmentId, publisherId);
+    public String deleteRiskAssessmentSchedule(@RequestParam(name = "riskAssessmentScheduleId") String riskAssessmentScheduleId, @RequestParam(name = "publisherId") String publisherId) {
+        RiskAssessmentSchedule deletedRiskAssessmentSchedule = riskAssessmentScheduleService.deleteRiskAssessmentSchedule(riskAssessmentScheduleId, publisherId);
         return "Risk assessment schedule: " + deletedRiskAssessmentSchedule.toString() + " deleted from risk assessment schedule repository";
     }
 
@@ -52,5 +53,11 @@ public class RiskAssessmentScheduleController {
         LOGGER.info(requestBody.toString());
         riskAssessmentScheduleService.attachBuildingRiskAssessmentIdToRiskAssessmentSchedules(requestBody);
         return "Building risk assessment: " + requestBody.getBuildingRiskAssessmentId() + " attached to risk assessment schedules: " + requestBody.getRiskAssessmentScheduleList().toString();
+    }
+
+    @RequestMapping(value = "/getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding", consumes = "application/json", produces = "application/json")
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding(@RequestBody GetBulkRiskAssessmentScheduleInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return riskAssessmentScheduleService.getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding(requestBody);
     }
 }

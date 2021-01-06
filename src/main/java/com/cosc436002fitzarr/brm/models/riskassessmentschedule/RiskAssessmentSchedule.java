@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Document(collection = "riskassessmentschedule")
 public class RiskAssessmentSchedule implements Entity {
@@ -157,5 +158,37 @@ public class RiskAssessmentSchedule implements Entity {
     @Override
     public void setPublisherId(String publisherId) {
         this.publisherId = publisherId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RiskAssessmentSchedule that = (RiskAssessmentSchedule) o;
+        return getId().equals(that.getId()) && getCreatedAt().equals(that.getCreatedAt()) && getUpdatedAt().equals(that.getUpdatedAt()) && getEntityTrail().equals(that.getEntityTrail()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getRiskAssessmentId().equals(that.getRiskAssessmentId()) && getBuildingRiskAssessmentId().equals(that.getBuildingRiskAssessmentId()) && getSiteMaintenanceAssociateIds().equals(that.getSiteMaintenanceAssociateIds()) && getStatus() == that.getStatus() && getWorkOrder().equals(that.getWorkOrder()) && getRiskLevel() == that.getRiskLevel() && getDueDate().equals(that.getDueDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getTitle(), getRiskAssessmentId(), getBuildingRiskAssessmentId(), getSiteMaintenanceAssociateIds(), getStatus(), getWorkOrder(), getRiskLevel(), getDueDate());
+    }
+
+    @Override
+    public String toString() {
+        return "RiskAssessmentSchedule{" +
+                "id='" + id + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", entityTrail=" + entityTrail +
+                ", publisherId='" + publisherId + '\'' +
+                ", title='" + title + '\'' +
+                ", riskAssessmentId='" + riskAssessmentId + '\'' +
+                ", buildingRiskAssessmentId='" + buildingRiskAssessmentId + '\'' +
+                ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
+                ", status=" + status +
+                ", workOrder=" + workOrder +
+                ", riskLevel=" + riskLevel +
+                ", dueDate=" + dueDate +
+                '}';
     }
 }

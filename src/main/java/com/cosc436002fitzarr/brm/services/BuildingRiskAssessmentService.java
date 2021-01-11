@@ -30,6 +30,8 @@ public class BuildingRiskAssessmentService {
     public BuildingService buildingService;
     @Autowired
     public RiskAssessmentService riskAssessmentService;
+    @Autowired
+    public RiskAssessmentScheduleService riskAssessmentScheduleService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(BuildingRiskAssessmentService.class);
 
@@ -135,9 +137,11 @@ public class BuildingRiskAssessmentService {
     }
 
     // TODO: This needs to be refactored so that we get a publisherID as input and use it in the risk assessment service and building service calls
-    public BuildingRiskAssessment deleteBuildingRiskAssessment(String id) {
+    public BuildingRiskAssessment deleteBuildingRiskAssessment(String id, String publisherId) {
         BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(id);
-
+        siteMaintenanceManagerService.removeBuildingRiskAssessmentFromList(publisherId, buildingRiskAssessmentToDelete.getId());
+        buildingService.removeBuildingRiskAssessmentFromBuilding(buildingRiskAssessmentToDelete.getBuildingId(), buildingRiskAssessmentToDelete.getId(), publisherId);
+        riskAssessmentScheduleService.deleteRiskAssessmentSchedulesFromDeletedBuildingRiskAssessment(buildingRiskAssessmentToDelete.getId(), publisherId);
         try {
             buildingRiskAssessmentRepository.deleteById(buildingRiskAssessmentToDelete.getId());
             LOGGER.info("Successfully deleted: " + buildingRiskAssessmentToDelete.toString() + " from the" +
@@ -146,26 +150,12 @@ public class BuildingRiskAssessmentService {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
         }
-        String siteMaintenanceManagerToUpdateId = buildingRiskAssessmentToDelete.getPublisherId();
-        siteMaintenanceManagerService.removeBuildingRiskAssessmentFromList(siteMaintenanceManagerToUpdateId, buildingRiskAssessmentToDelete.getId());
-        buildingService.removeBuildingRiskAssessmentFromBuilding(buildingRiskAssessmentToDelete.getBuildingId(), buildingRiskAssessmentToDelete.getId(), siteMaintenanceManagerToUpdateId);
-        riskAssessmentService.deleteRiskAssessments(new DeleteRiskAssessmentsInput(buildingRiskAssessmentToDelete.getRiskAssessmentIds(), siteMaintenanceManagerToUpdateId));
         return buildingRiskAssessmentToDelete;
     }
 
     public void deleteBuildingRiskAssessments(List<String> buildingRiskAssessmentIds, String publisherId) {
         for (String buildingRiskAssessmentId : buildingRiskAssessmentIds) {
-            BuildingRiskAssessment buildingRiskAssessmentToDelete = checkBuildingRiskAssessmentExists(buildingRiskAssessmentId);
-
-            try {
-                buildingRiskAssessmentRepository.deleteById(buildingRiskAssessmentToDelete.getId());
-                LOGGER.info("Successfully deleted: " + buildingRiskAssessmentToDelete.toString() + " from the building risk assessment repository");
-            } catch (Exception e) {
-                LOGGER.info(e.toString());
-                throw new RuntimeException(e);
-            }
-            buildingService.removeBuildingRiskAssessmentFromBuilding(buildingRiskAssessmentToDelete.getBuildingId(), buildingRiskAssessmentToDelete.getId(), publisherId);
-            riskAssessmentService.deleteRiskAssessments(new DeleteRiskAssessmentsInput(buildingRiskAssessmentToDelete.getRiskAssessmentIds(), publisherId));
+           deleteBuildingRiskAssessment(buildingRiskAssessmentId, publisherId);
         }
     }
 

@@ -3,6 +3,7 @@ package com.cosc436002fitzarr.brm.services;
 import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.PageInput;
 import com.cosc436002fitzarr.brm.models.user.User;
+import com.cosc436002fitzarr.brm.models.user.input.AuthenticateUserPasswordInput;
 import com.cosc436002fitzarr.brm.utils.PageUtils;
 
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.persistence.EntityNotFoundException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -116,5 +118,24 @@ public class UserService {
         }
 
         return user.isPresent() ? user.get() : null;
+    }
+
+    public User checkUserExists(String id) {
+        Optional<User> potentialUser = userRepository.findById(id);
+        if (!potentialUser.isPresent()) {
+            LOGGER.info("User with id: " + id + " not found in user repository");
+            throw new EntityNotFoundException("User with id: " + id + " not found in user repository");
+        }
+        return potentialUser.get();
+    }
+
+    public Boolean authenticateUserPassword(AuthenticateUserPasswordInput input) {
+        User existingUser = checkUserExists(input.getUserId());
+
+        String existingHashedPassword = existingUser.getHashPassword();
+
+        String inputHashedPassword = createHashedPassword(input.getPassword());
+
+        return inputHashedPassword.equals(existingHashedPassword);
     }
 }

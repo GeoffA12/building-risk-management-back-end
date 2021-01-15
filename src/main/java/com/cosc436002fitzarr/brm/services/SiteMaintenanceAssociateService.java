@@ -125,6 +125,8 @@ public class SiteMaintenanceAssociateService {
 
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociate = getUpdatedSiteMaintenanceAssociate(existingSiteMaintenanceAssociate.getId(), input.getUserId());
 
+        String passwordInput = input.getPassword() != null ? UserService.createHashedPassword(input.getPassword()) : updatedSiteMaintenanceAssociate.getHashPassword();
+
         // TODO: If the user updates the site role of the employee, then we will end up storing WHS Members and Site Maintenance Managers in the SiteMaintenanceAssociate repository.
         SiteMaintenanceAssociate updatedSiteMaintenanceAssociateForPersistence = new SiteMaintenanceAssociate(
             updatedSiteMaintenanceAssociate.getId(),
@@ -139,7 +141,7 @@ public class SiteMaintenanceAssociateService {
             input.getEmail(),
             input.getPhone(),
             updatedSiteMaintenanceAssociate.getAuthToken(),
-            updatedSiteMaintenanceAssociate.getHashPassword(),
+            passwordInput,
             input.getSiteIds(),
             updatedSiteMaintenanceAssociate.getSiteMaintenanceManagerId(),
             updatedSiteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds()

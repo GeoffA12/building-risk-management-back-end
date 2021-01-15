@@ -78,6 +78,7 @@ public class SiteAdminService {
 
     public SiteAdmin updateSiteAdmin(UpdateUserInput input) {
         SiteAdmin updatedSiteAdmin = getUpdatedSiteAdmin(input.getId(), input.getUserId());
+        String passwordInput = input.getPassword() != null ? UserService.createHashedPassword(input.getPassword()) : updatedSiteAdmin.getHashPassword();
 
         SiteAdmin updatedSiteAdminForPersistence = new SiteAdmin(
             updatedSiteAdmin.getId(),
@@ -92,7 +93,7 @@ public class SiteAdminService {
             input.getEmail(),
             input.getPhone(),
             updatedSiteAdmin.getAuthToken(),
-            updatedSiteAdmin.getHashPassword(),
+            passwordInput,
             input.getSiteIds()
         );
 

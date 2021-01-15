@@ -117,6 +117,8 @@ public class SiteMaintenanceManagerService {
     public SiteMaintenanceManager updateSiteMaintenanceManager(UpdateUserInput input) {
         SiteMaintenanceManager updatedSiteMaintenanceManager = getUpdatedSiteMaintenanceManager(input.getId(), input.getUserId());
 
+        String passwordInput = input.getPassword() != null ? UserService.createHashedPassword(input.getPassword()) : updatedSiteMaintenanceManager.getHashPassword();
+
         SiteMaintenanceManager updatedSiteMaintenanceManagerForPersistence = new SiteMaintenanceManager(
             updatedSiteMaintenanceManager.getId(),
             updatedSiteMaintenanceManager.getCreatedAt(),
@@ -130,7 +132,7 @@ public class SiteMaintenanceManagerService {
             input.getEmail(),
             input.getPhone(),
             updatedSiteMaintenanceManager.getAuthToken(),
-            updatedSiteMaintenanceManager.getHashPassword(),
+            passwordInput,
             input.getSiteIds(),
             updatedSiteMaintenanceManager.getSiteMaintenanceAssociateIds(),
             updatedSiteMaintenanceManager.getBuildingRiskAssessmentIdsFiled(),

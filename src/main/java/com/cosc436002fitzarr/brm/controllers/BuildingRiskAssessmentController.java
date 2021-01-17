@@ -38,8 +38,8 @@ public class BuildingRiskAssessmentController {
     }
 
     @DeleteMapping(value = "/deleteBuildingRiskAssessment")
-    public String deleteBuildingRiskAssessment(@RequestParam(name="id") String id) {
-        BuildingRiskAssessment deletedBuildingRiskAssessment = buildingRiskAssessmentsService.deleteBuildingRiskAssessment(id);
+    public String deleteBuildingRiskAssessment(@RequestParam(name="id") String id, @RequestParam(name="publisherId") String publisherId) {
+        BuildingRiskAssessment deletedBuildingRiskAssessment = buildingRiskAssessmentsService.deleteBuildingRiskAssessment(id, publisherId);
         return "Deleted: " + deletedBuildingRiskAssessment.toString() + " from building risk assessments repository";
     }
 

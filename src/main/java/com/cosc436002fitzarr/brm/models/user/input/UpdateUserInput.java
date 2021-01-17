@@ -1,6 +1,5 @@
 package com.cosc436002fitzarr.brm.models.user.input;
 
-import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,11 +15,12 @@ public class UpdateUserInput {
     private String email;
     private String phone;
     private List<String> siteIds;
+    private String password;
 
     @JsonCreator
     public UpdateUserInput(@JsonProperty String id, @JsonProperty String userId, @JsonProperty String firstName,
                            @JsonProperty String lastName, @JsonProperty String username, @JsonProperty String email,
-                           @JsonProperty String phone, @JsonProperty List<String> siteIds) {
+                           @JsonProperty String phone, @JsonProperty List<String> siteIds, @JsonProperty String password) {
         this.id = id;
         this.userId = userId;
         this.firstName = firstName;
@@ -29,6 +29,15 @@ public class UpdateUserInput {
         this.email = email;
         this.phone = phone;
         this.siteIds = siteIds;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getId() {
@@ -107,13 +116,14 @@ public class UpdateUserInput {
                 getUsername().equals(that.getUsername()) &&
                 getEmail().equals(that.getEmail()) &&
                 getPhone().equals(that.getPhone()) &&
-                getSiteIds().equals(that.getSiteIds());
+                getSiteIds().equals(that.getSiteIds()) &&
+                getPassword().equals(that.getPassword());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getUserId(), getFirstName(), getLastName(), getUsername(), getEmail(),
-                getPhone(), getSiteIds());
+                getPhone(), getSiteIds(), getPassword());
     }
 
     @Override
@@ -127,6 +137,7 @@ public class UpdateUserInput {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", siteIds='" + siteIds + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 }

@@ -114,6 +114,8 @@ public class WorkplaceHealthSafetyMemberService {
 
         updatedTrail.add(updateTrail);
 
+        String passwordInput = input.getPassword() != null ? UserService.createHashedPassword(input.getPassword()) : existingWorkplaceHealthSafetyMember.getHashPassword();
+
         WorkplaceHealthSafetyMember updatedWorkplaceHealthSafetyMemberForPersistence = new WorkplaceHealthSafetyMember(
             existingWorkplaceHealthSafetyMember.getId(),
             existingWorkplaceHealthSafetyMember.getCreatedAt(),
@@ -127,7 +129,7 @@ public class WorkplaceHealthSafetyMemberService {
             input.getEmail(),
             input.getPhone(),
             existingWorkplaceHealthSafetyMember.getAuthToken(),
-            existingWorkplaceHealthSafetyMember.getHashPassword(),
+            passwordInput,
             input.getSiteIds(),
             existingWorkplaceHealthSafetyMember.getRiskAssessmentsFiledIds()
         );

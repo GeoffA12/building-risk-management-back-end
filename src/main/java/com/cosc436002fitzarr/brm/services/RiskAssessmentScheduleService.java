@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.services;
 
+import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
@@ -47,7 +48,7 @@ public class RiskAssessmentScheduleService {
             input.getRiskAssessmentId(),
             input.getBuildingRiskAssessmentId(),
             input.getSiteMaintenanceAssociateIds(),
-            input.getStatus(),
+            Status.IN_PROGRESS,
             input.getWorkOrder(),
             input.getRiskLevel(),
             dueDate
@@ -111,6 +112,11 @@ public class RiskAssessmentScheduleService {
 
         LocalDateTime updatedDueDate = convertDateTimeStringToLocalDateTime(input.getCreateRiskAssessmentScheduleInput().getDueDate());
 
+        Status updatedScheduleStatus = updatedRiskAssessmentSchedule.getStatus();
+        if (input.getCreateRiskAssessmentScheduleInput().getSiteMaintenanceAssociateIds().size() == 0) {
+            updatedScheduleStatus = Status.NOT_ASSIGNED;
+        }
+
         RiskAssessmentSchedule updatedRiskAssessmentScheduleForPersistence = new RiskAssessmentSchedule(
             updatedRiskAssessmentSchedule.getId(),
             updatedRiskAssessmentSchedule.getCreatedAt(),
@@ -121,7 +127,7 @@ public class RiskAssessmentScheduleService {
             input.getCreateRiskAssessmentScheduleInput().getRiskAssessmentId(),
             input.getCreateRiskAssessmentScheduleInput().getBuildingRiskAssessmentId(),
             input.getCreateRiskAssessmentScheduleInput().getSiteMaintenanceAssociateIds(),
-            input.getCreateRiskAssessmentScheduleInput().getStatus(),
+            updatedScheduleStatus,
             input.getCreateRiskAssessmentScheduleInput().getWorkOrder(),
             input.getCreateRiskAssessmentScheduleInput().getRiskLevel(),
             updatedDueDate
@@ -190,6 +196,10 @@ public class RiskAssessmentScheduleService {
 
             updatedRiskAssessmentSchedule.setSiteMaintenanceAssociateIds(siteMaintenanceAssociateIdsOfSchedule);
 
+            if (updatedRiskAssessmentSchedule.getSiteMaintenanceAssociateIds().size() == 0) {
+                updatedRiskAssessmentSchedule.setStatus(Status.NOT_ASSIGNED);
+            }
+
             try {
                 riskAssessmentScheduleRepository.save(updatedRiskAssessmentSchedule);
                 LOGGER.info("Risk assessment schedule: " + updatedRiskAssessmentSchedule.toString() + " updated and saved in risk assessment schedule repository");
@@ -236,6 +246,14 @@ public class RiskAssessmentScheduleService {
 
     public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding(GetBulkRiskAssessmentScheduleInput input) {
         return riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentIdList(input.getRiskAssessmentIds());
+    }
+
+    public void deleteRiskAssessmentSchedulesFromDeletedBuildingRiskAssessment(String buildingRiskAssessmentId, String publisherId) {
+        List<RiskAssessmentSchedule> riskAssessmentSchedulesOfBuildingRiskAssessment = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByBuildingRiskAssessmentId(buildingRiskAssessmentId);
+
+        for (RiskAssessmentSchedule riskAssessmentSchedule : riskAssessmentSchedulesOfBuildingRiskAssessment) {
+            deleteRiskAssessmentSchedule(riskAssessmentSchedule.getId(), publisherId);
+        }
     }
 
     public String getCreatedRiskAssessmentScheduleSystemComment() {

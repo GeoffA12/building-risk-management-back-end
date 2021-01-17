@@ -138,7 +138,7 @@ public class BuildingRiskAssessment implements Entity {
 
     @Override
     public String toString() {
-        return "BuildingRiskAssessments{" +
+        return "BuildingRiskAssessment{" +
                 "id='" + id + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

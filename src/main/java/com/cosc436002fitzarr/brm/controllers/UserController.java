@@ -3,6 +3,7 @@ package com.cosc436002fitzarr.brm.controllers;
 import com.cosc436002fitzarr.brm.enums.SiteRole;
 import com.cosc436002fitzarr.brm.models.user.User;
 
+import com.cosc436002fitzarr.brm.models.user.input.AuthenticateUserPasswordInput;
 import com.cosc436002fitzarr.brm.models.user.input.GetAllUsersBySiteInput;
 
 import com.cosc436002fitzarr.brm.services.UserService;
@@ -41,5 +42,11 @@ public class UserController {
     @GetMapping(value = "/getUserById")
     public User getUserById(@RequestParam(name = "id") String id) {
         return userService.getUserById(id);
+    }
+
+    @PostMapping(value = "/authenticateUserPassword", consumes = "application/json", produces = "application/json")
+    public Boolean authenticateUserPassword(@RequestBody AuthenticateUserPasswordInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return userService.authenticateUserPassword(requestBody);
     }
 }

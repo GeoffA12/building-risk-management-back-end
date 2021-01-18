@@ -1,10 +1,7 @@
 package com.cosc436002fitzarr.brm.controllers;
 
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.CreateRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetBulkRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.UpdateRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.*;
 import com.cosc436002fitzarr.brm.services.RiskAssessmentScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,4 +57,11 @@ public class RiskAssessmentScheduleController {
         LOGGER.info(requestBody.toString());
         return riskAssessmentScheduleService.getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding(requestBody);
     }
+
+    @RequestMapping(value = "/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList", consumes = "application/json", produces = "application/json")
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(@RequestBody GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput requestBody) {
+        LOGGER.info(requestBody.toString());
+        return riskAssessmentScheduleService.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(requestBody);
+    }
+
 }

@@ -3,10 +3,7 @@ package com.cosc436002fitzarr.brm.services;
 import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.CreateRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetBulkRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.UpdateRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.*;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.repositories.RiskAssessmentScheduleRepository;
 import org.slf4j.Logger;
@@ -246,6 +243,10 @@ public class RiskAssessmentScheduleService {
 
     public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding(GetBulkRiskAssessmentScheduleInput input) {
         return riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentIdList(input.getRiskAssessmentIds());
+    }
+
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput input) {
+        return riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(input.getRiskAssessmentScheduleIds());
     }
 
     public void deleteRiskAssessmentSchedulesFromDeletedBuildingRiskAssessment(String buildingRiskAssessmentId, String publisherId) {

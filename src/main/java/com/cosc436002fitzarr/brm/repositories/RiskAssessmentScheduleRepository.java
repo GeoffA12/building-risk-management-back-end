@@ -13,4 +13,7 @@ public interface RiskAssessmentScheduleRepository extends MongoRepository<RiskAs
 
     @Query(value = "{ 'riskAssessmentId': { $in: ?0 }}")
     public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentIdList(List<String> riskAssessmentIdsOfBuildingRiskAssessment);
+
+    @Query(value = "{ 'id': { $in: ?0 }}")
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(List<String> assignedRiskAssessmentScheduleIds);
 }

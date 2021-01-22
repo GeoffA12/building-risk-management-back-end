@@ -1,7 +1,11 @@
 package com.cosc436002fitzarr.brm.controllers;
 
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.*;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.CreateRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetBulkRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.UpdateRiskAssessmentScheduleInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput;
 import com.cosc436002fitzarr.brm.services.RiskAssessmentScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

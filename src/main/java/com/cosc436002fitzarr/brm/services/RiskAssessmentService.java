@@ -51,8 +51,6 @@ public class RiskAssessmentService {
             input.getPublisherId(),
             input.getTitle(),
             input.getTaskDescription(),
-            input.getHazards(),
-            input.getScreeners(),
             riskAssessmentScheduleIds
         );
 
@@ -78,8 +76,6 @@ public class RiskAssessmentService {
             updatedRiskAssessment.getPublisherId(),
             input.getTitle(),
             input.getTaskDescription(),
-            input.getHazards(),
-            input.getScreeners(),
             input.getRiskAssessmentScheduleIds()
         );
 

@@ -50,6 +50,8 @@ public class RiskAssessmentScheduleService {
             input.getSiteMaintenanceAssociateIds(),
             Status.IN_PROGRESS,
             input.getWorkOrder(),
+            input.getHazards(),
+            input.getScreeners(),
             input.getRiskLevel(),
             dueDate
         );
@@ -129,6 +131,8 @@ public class RiskAssessmentScheduleService {
             input.getCreateRiskAssessmentScheduleInput().getSiteMaintenanceAssociateIds(),
             updatedScheduleStatus,
             input.getCreateRiskAssessmentScheduleInput().getWorkOrder(),
+            input.getCreateRiskAssessmentScheduleInput().getHazards(),
+            input.getCreateRiskAssessmentScheduleInput().getScreeners(),
             input.getCreateRiskAssessmentScheduleInput().getRiskLevel(),
             updatedDueDate
         );

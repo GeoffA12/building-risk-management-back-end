@@ -1,4 +1,4 @@
-package com.cosc436002fitzarr.brm.models.riskassessment;
+package com.cosc436002fitzarr.brm.models.riskassessmentschedule;
 
 import com.cosc436002fitzarr.brm.enums.Response;
 

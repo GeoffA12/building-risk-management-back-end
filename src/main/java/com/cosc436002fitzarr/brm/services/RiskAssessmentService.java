@@ -151,6 +151,10 @@ public class RiskAssessmentService {
     public void addRiskAssessmentScheduleToRiskAssessment(String riskAssessmentScheduleId, String riskAssessmentId, String publisherId) {
         RiskAssessment existingRiskAssessment = checkRiskAssessmentExists(riskAssessmentId);
 
+        if (existingRiskAssessment.getRiskAssessmentScheduleIds().contains(riskAssessmentScheduleId)) {
+            return;
+        }
+
         RiskAssessment updatedRiskAssessment = getUpdatedRiskAssessment(existingRiskAssessment.getId(), publisherId);
 
         List<String> existingRiskAssessmentScheduleIdList = updatedRiskAssessment.getRiskAssessmentScheduleIds();

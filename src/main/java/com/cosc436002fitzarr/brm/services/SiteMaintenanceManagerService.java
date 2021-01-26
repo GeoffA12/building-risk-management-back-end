@@ -1,6 +1,8 @@
 package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
+import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
 import com.cosc436002fitzarr.brm.models.user.input.UpdateUserInput;
@@ -28,6 +30,10 @@ public class SiteMaintenanceManagerService {
     public SiteService siteService;
     @Autowired
     public BuildingRiskAssessmentService buildingRiskAssessmentService;
+    @Autowired
+    public SiteMaintenanceAssociateService siteMaintenanceAssociateService;
+    @Autowired
+    public RiskAssessmentScheduleService riskAssessmentScheduleService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SiteMaintenanceManagerService.class);
 
@@ -273,6 +279,22 @@ public class SiteMaintenanceManagerService {
             LOGGER.info(e.toString());
             throw new RuntimeException(e);
         }
+    }
+
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(String id, Boolean activeSchedules) {
+        SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(id);
+
+        List<SiteMaintenanceAssociate> siteMaintenanceAssociatesOfManager = siteMaintenanceAssociateService.getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(existingSiteMaintenanceManager.getSiteMaintenanceAssociateIds());
+
+        Set<String> riskAssessmentScheduleIds = new HashSet<>();
+
+        for (SiteMaintenanceAssociate siteMaintenanceAssociate : siteMaintenanceAssociatesOfManager) {
+            riskAssessmentScheduleIds.addAll(siteMaintenanceAssociate.getAssignedRiskAssessmentScheduleIds());
+        }
+
+        List<String> uniqueRiskAssessmentScheduleIds = new ArrayList<>(riskAssessmentScheduleIds);
+
+        return riskAssessmentScheduleService.getRiskAssessmentSchedulesOfSiteMaintenanceManager(uniqueRiskAssessmentScheduleIds, activeSchedules);
     }
 
     public String getCreatedSiteMaintenanceManagerSystemComment() {

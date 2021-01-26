@@ -6,7 +6,6 @@ import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;

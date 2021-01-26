@@ -20,6 +20,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RiskAssessmentScheduleService {
@@ -263,6 +264,14 @@ public class RiskAssessmentScheduleService {
         for (RiskAssessmentSchedule riskAssessmentSchedule : riskAssessmentSchedulesOfBuildingRiskAssessment) {
             deleteRiskAssessmentSchedule(riskAssessmentSchedule.getId(), publisherId);
         }
+    }
+
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceManager(List<String> riskAssessmentScheduleIds, Boolean activeSchedules) {
+        List<RiskAssessmentSchedule> riskAssessmentSchedulesOfMaintenanceManager = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(riskAssessmentScheduleIds);
+
+        return riskAssessmentSchedulesOfMaintenanceManager.stream()
+                .filter(riskAssessmentSchedule -> activeSchedules ? !riskAssessmentSchedule.getStatus().equals(Status.COMPLETE) : riskAssessmentSchedule.getStatus().equals(Status.COMPLETE))
+                .collect(Collectors.toList());
     }
 
     public String getCreatedRiskAssessmentScheduleSystemComment() {

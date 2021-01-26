@@ -11,4 +11,7 @@ import java.util.List;
 public interface SiteMaintenanceAssociateRepository extends MongoRepository<SiteMaintenanceAssociate, String> {
     @Query(value = "{ 'associatedSiteIds': { $in: ?0 } }")
     public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySite(List<String> associatedSiteIds);
+
+    @Query(value = "{ '_id': { $in: ?0 } }")
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(List<String> siteMaintenanceAssociateIds);
 }

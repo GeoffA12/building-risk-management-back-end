@@ -1,7 +1,6 @@
 package com.cosc436002fitzarr.brm.models.riskassessmentschedule.input;
 
 import com.cosc436002fitzarr.brm.enums.RiskLevel;
-import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.Hazard;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.Screener;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -13,7 +12,6 @@ import java.util.Objects;
 public class CreateRiskAssessmentScheduleInput {
     private String title;
     private String publisherId;
-    private Status status;
     private String dueDate;
     private RiskLevel riskLevel;
     private List<String> siteMaintenanceAssociateIds;
@@ -24,13 +22,12 @@ public class CreateRiskAssessmentScheduleInput {
     private String riskAssessmentId;
 
     @JsonCreator
-    public CreateRiskAssessmentScheduleInput(@JsonProperty String title, @JsonProperty String publisherId, @JsonProperty Status status, @JsonProperty String dueDate,
+    public CreateRiskAssessmentScheduleInput(@JsonProperty String title, @JsonProperty String publisherId, @JsonProperty String dueDate,
                                              @JsonProperty RiskLevel riskLevel, @JsonProperty List<String> siteMaintenanceAssociateIds, @JsonProperty Long workOrder,
                                              @JsonProperty List<Hazard> hazards, @JsonProperty List<Screener> screeners, @JsonProperty String buildingRiskAssessmentId,
                                              @JsonProperty String riskAssessmentId) {
         this.title = title;
         this.publisherId = publisherId;
-        this.status = status;
         this.dueDate = dueDate;
         this.riskLevel = riskLevel;
         this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
@@ -71,14 +68,6 @@ public class CreateRiskAssessmentScheduleInput {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public String getDueDate() {
@@ -126,12 +115,21 @@ public class CreateRiskAssessmentScheduleInput {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateRiskAssessmentScheduleInput that = (CreateRiskAssessmentScheduleInput) o;
-        return Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getPublisherId(), that.getPublisherId()) && getStatus() == that.getStatus() && Objects.equals(getDueDate(), that.getDueDate()) && getRiskLevel() == that.getRiskLevel() && Objects.equals(getSiteMaintenanceAssociateIds(), that.getSiteMaintenanceAssociateIds()) && Objects.equals(getWorkOrder(), that.getWorkOrder()) && Objects.equals(getHazards(), that.getHazards()) && Objects.equals(getScreeners(), that.getScreeners()) && Objects.equals(getBuildingRiskAssessmentId(), that.getBuildingRiskAssessmentId()) && Objects.equals(getRiskAssessmentId(), that.getRiskAssessmentId());
+        return Objects.equals(getTitle(), that.getTitle()) &&
+                Objects.equals(getPublisherId(), that.getPublisherId()) &&
+                Objects.equals(getDueDate(), that.getDueDate()) &&
+                getRiskLevel() == that.getRiskLevel() &&
+                Objects.equals(getSiteMaintenanceAssociateIds(), that.getSiteMaintenanceAssociateIds()) &&
+                Objects.equals(getWorkOrder(), that.getWorkOrder()) &&
+                Objects.equals(getHazards(), that.getHazards()) &&
+                Objects.equals(getScreeners(), that.getScreeners()) &&
+                Objects.equals(getBuildingRiskAssessmentId(), that.getBuildingRiskAssessmentId()) &&
+                Objects.equals(getRiskAssessmentId(), that.getRiskAssessmentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTitle(), getPublisherId(), getStatus(), getDueDate(), getRiskLevel(), getSiteMaintenanceAssociateIds(), getWorkOrder(), getHazards(), getScreeners(), getBuildingRiskAssessmentId(), getRiskAssessmentId());
+        return Objects.hash(getTitle(), getPublisherId(), getDueDate(), getRiskLevel(), getSiteMaintenanceAssociateIds(), getWorkOrder(), getHazards(), getScreeners(), getBuildingRiskAssessmentId(), getRiskAssessmentId());
     }
 
     @Override
@@ -139,7 +137,6 @@ public class CreateRiskAssessmentScheduleInput {
         return "CreateRiskAssessmentScheduleInput{" +
                 "title='" + title + '\'' +
                 ", publisherId='" + publisherId + '\'' +
-                ", status=" + status +
                 ", dueDate='" + dueDate + '\'' +
                 ", riskLevel=" + riskLevel +
                 ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +

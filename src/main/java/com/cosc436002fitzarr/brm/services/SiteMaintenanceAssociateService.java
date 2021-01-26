@@ -227,6 +227,10 @@ public class SiteMaintenanceAssociateService {
         return siteMaintenanceAssociateToDelete;
     }
 
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(List<String> siteMaintenanceAssociateIdList) {
+        return siteMaintenanceAssociateRepository.getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(siteMaintenanceAssociateIdList);
+    }
+
     public String getSiteMaintenanceAssociateCreatedSystemComment() {
         return "SITE MAINTENANCE ASSOCIATE CREATED";
     }

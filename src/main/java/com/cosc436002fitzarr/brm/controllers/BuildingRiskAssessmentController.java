@@ -3,6 +3,7 @@ package com.cosc436002fitzarr.brm.controllers;
 import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.CreateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.GetBuildingRiskAssessmentsBySiteInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.UpdateBuildingRiskAssessmentInput;
 import com.cosc436002fitzarr.brm.services.BuildingRiskAssessmentService;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -44,7 +46,7 @@ public class BuildingRiskAssessmentController {
     }
 
     @PostMapping(value = "/getBuildingRiskAssessmentsBySite", consumes = "application/json", produces = "application/json")
-    public List<BuildingRiskAssessment> getBuildingRiskAssessmentsBySite(@RequestBody GetEntityBySiteInput requestBody) {
+    public Map<String, Object> getBuildingRiskAssessmentsBySite(@RequestBody GetBuildingRiskAssessmentsBySiteInput requestBody) {
         LOGGER.info(requestBody.toString());
         return buildingRiskAssessmentsService.getBuildingRiskAssessmentsBySite(requestBody);
     }

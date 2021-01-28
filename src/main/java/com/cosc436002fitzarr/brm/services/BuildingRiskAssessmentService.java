@@ -4,20 +4,29 @@ import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.GetEntityBySiteInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.CreateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.GetBuildingRiskAssessmentsBySiteInput;
 import com.cosc436002fitzarr.brm.models.buildingriskassessment.input.UpdateBuildingRiskAssessmentInput;
+import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.input.DeleteRiskAssessmentsInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.repositories.BuildingRiskAssessmentRepository;
+import com.cosc436002fitzarr.brm.utils.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,8 +37,6 @@ public class BuildingRiskAssessmentService {
     public SiteMaintenanceManagerService siteMaintenanceManagerService;
     @Autowired
     public BuildingService buildingService;
-    @Autowired
-    public RiskAssessmentService riskAssessmentService;
     @Autowired
     public RiskAssessmentScheduleService riskAssessmentScheduleService;
 
@@ -80,8 +87,14 @@ public class BuildingRiskAssessmentService {
         return existingBuildingRiskAssessment;
     }
 
-    public List<BuildingRiskAssessment> getBuildingRiskAssessmentsBySite(GetEntityBySiteInput input) {
-        List<SiteMaintenanceManager> authorizedSiteMaintenanceManagers = siteMaintenanceManagerService.getSiteMaintenanceManagersBySite(input.getAssociatedSiteIds());
+    public Map<String, Object> getBuildingRiskAssessmentsBySite(GetBuildingRiskAssessmentsBySiteInput input) {
+        Sort sortProperty = Sort.by(input.getPageInput().getSortDirection(), input.getPageInput().getSortBy());
+        Pageable pageInput = PageRequest.of(input.getPageInput().getPageNo().intValue(), input.getPageInput().getPageSize().intValue(), sortProperty);
+
+        Page<BuildingRiskAssessment> sortedBuildingRiskAssessmentsInPage = buildingRiskAssessmentRepository.findAll(pageInput);
+        List<BuildingRiskAssessment> buildingRiskAssessmentsContent = sortedBuildingRiskAssessmentsInPage.getContent();
+
+        List<SiteMaintenanceManager> authorizedSiteMaintenanceManagers = siteMaintenanceManagerService.getSiteMaintenanceManagersBySite(input.getGetEntityBySiteInput().getAssociatedSiteIds());
 
         List<String> bulkBuildingRiskAssessmentIdList = new ArrayList<>();
 
@@ -91,7 +104,11 @@ public class BuildingRiskAssessmentService {
 
         List<BuildingRiskAssessment> allAssessmentsAtSite = buildingRiskAssessmentRepository.getBuildingRiskAssessmentsBySite(bulkBuildingRiskAssessmentIdList);
 
-        return allAssessmentsAtSite;
+        List<BuildingRiskAssessment> sortedRiskAssessmentAtSite = buildingRiskAssessmentsContent.stream()
+                .filter(allAssessmentsAtSite::contains)
+                .collect(Collectors.toList());
+
+        return PageUtils.getBuildingRiskAssessmentMappingResponse(sortedRiskAssessmentAtSite);
     }
 
     public BuildingRiskAssessment updateBuildingRiskAssessment(UpdateBuildingRiskAssessmentInput input) {

@@ -169,6 +169,14 @@ public class RiskAssessmentScheduleService {
 
     public RiskAssessmentSchedule deleteRiskAssessmentSchedule(String riskAssessmentScheduleId, String publisherId) {
         RiskAssessmentSchedule riskAssessmentScheduleToDelete = checkRiskAssessmentScheduleExists(riskAssessmentScheduleId);
+
+        // If we delete a risk assessment schedule we also need to update the id list of the risk assessment it was attached to and remove the schedule
+        // from any associates who were assigned to it.
+        riskAssessmentService.removeDeletedRiskAssessmentScheduleFromRiskAssessment(riskAssessmentScheduleToDelete.getRiskAssessmentId(), riskAssessmentScheduleToDelete.getId(), publisherId);
+        for (String siteMaintenanceAssociateId : riskAssessmentScheduleToDelete.getSiteMaintenanceAssociateIds()) {
+            siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentScheduleToDelete.getId(), publisherId);
+        }
+
         try {
             riskAssessmentScheduleRepository.deleteById(riskAssessmentScheduleToDelete.getId());
             LOGGER.info("Risk assessment schedule: " + riskAssessmentScheduleToDelete.toString() + " deleted from risk assessment schedule repository");
@@ -177,12 +185,6 @@ public class RiskAssessmentScheduleService {
             throw new RuntimeException(e);
         }
 
-        // If we delete a risk assessment schedule we also need to update the id list of the risk assessment it was attached to and remove the schedule
-        // from any associates who were assigned to it.
-        riskAssessmentService.removeDeletedRiskAssessmentScheduleFromRiskAssessment(riskAssessmentScheduleToDelete.getRiskAssessmentId(), riskAssessmentScheduleToDelete.getId(), publisherId);
-        for (String siteMaintenanceAssociateId : riskAssessmentScheduleToDelete.getSiteMaintenanceAssociateIds()) {
-            siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentScheduleToDelete.getId(), publisherId);
-        }
         return riskAssessmentScheduleToDelete;
     }
 
@@ -257,6 +259,7 @@ public class RiskAssessmentScheduleService {
     public void deleteRiskAssessmentSchedulesFromDeletedBuildingRiskAssessment(String buildingRiskAssessmentId, String publisherId) {
         List<RiskAssessmentSchedule> riskAssessmentSchedulesOfBuildingRiskAssessment = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByBuildingRiskAssessmentId(buildingRiskAssessmentId);
 
+        LOGGER.info(riskAssessmentSchedulesOfBuildingRiskAssessment.toString());
         for (RiskAssessmentSchedule riskAssessmentSchedule : riskAssessmentSchedulesOfBuildingRiskAssessment) {
             deleteRiskAssessmentSchedule(riskAssessmentSchedule.getId(), publisherId);
         }

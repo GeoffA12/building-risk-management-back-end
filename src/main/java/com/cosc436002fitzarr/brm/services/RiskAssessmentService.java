@@ -218,7 +218,8 @@ public class RiskAssessmentService {
 
         List<String> updatedRiskAssessmentScheduleIds = new ArrayList<>(updatedRiskAssessment.getRiskAssessmentScheduleIds());
 
-        updatedRiskAssessmentScheduleIds.add(riskAssessmentScheduleId);
+        // updatedRiskAssessmentScheduleIds.add(riskAssessmentScheduleId);
+        updatedRiskAssessmentScheduleIds.remove(riskAssessmentScheduleId);
 
         updatedRiskAssessment.setRiskAssessmentScheduleIds(updatedRiskAssessmentScheduleIds);
 

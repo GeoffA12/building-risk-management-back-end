@@ -1,7 +1,5 @@
 package com.cosc436002fitzarr.brm.models.riskassessment.input;
 
-import com.cosc436002fitzarr.brm.models.riskassessment.Hazard;
-import com.cosc436002fitzarr.brm.models.riskassessment.Screener;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,21 +11,16 @@ public class UpdateRiskAssessmentInput {
     private String publisherId;
     private String title;
     private String taskDescription;
-    private List<Hazard> hazards;
-    private List<Screener> screeners;
     private List<String> riskAssessmentScheduleIds;
 
     @JsonCreator
     public UpdateRiskAssessmentInput(@JsonProperty String id, @JsonProperty String publisherId,
                                      @JsonProperty String title, @JsonProperty String taskDescription,
-                                     @JsonProperty List<Hazard> hazards, @JsonProperty List<Screener> screeners,
                                      @JsonProperty List<String> riskAssessmentScheduleIds) {
         this.id = id;
         this.publisherId = publisherId;
         this.title = title;
         this.taskDescription = taskDescription;
-        this.hazards = hazards;
-        this.screeners = screeners;
         this.riskAssessmentScheduleIds = riskAssessmentScheduleIds;
     }
 
@@ -63,22 +56,6 @@ public class UpdateRiskAssessmentInput {
         this.taskDescription = taskDescription;
     }
 
-    public List<Hazard> getHazards() {
-        return hazards;
-    }
-
-    public void setHazards(List<Hazard> hazards) {
-        this.hazards = hazards;
-    }
-
-    public List<Screener> getScreeners() {
-        return screeners;
-    }
-
-    public void setScreeners(List<Screener> screeners) {
-        this.screeners = screeners;
-    }
-
     public List<String> getRiskAssessmentScheduleIds() {
         return riskAssessmentScheduleIds;
     }
@@ -92,12 +69,12 @@ public class UpdateRiskAssessmentInput {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UpdateRiskAssessmentInput that = (UpdateRiskAssessmentInput) o;
-        return getId().equals(that.getId()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getTaskDescription().equals(that.getTaskDescription()) && getHazards().equals(that.getHazards()) && getScreeners().equals(that.getScreeners()) && getRiskAssessmentScheduleIds().equals(that.getRiskAssessmentScheduleIds());
+        return getId().equals(that.getId()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getTaskDescription().equals(that.getTaskDescription()) && getRiskAssessmentScheduleIds().equals(that.getRiskAssessmentScheduleIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPublisherId(), getTitle(), getTaskDescription(), getHazards(), getScreeners(), getRiskAssessmentScheduleIds());
+        return Objects.hash(getId(), getPublisherId(), getTitle(), getTaskDescription(), getRiskAssessmentScheduleIds());
     }
 
     @Override
@@ -107,8 +84,6 @@ public class UpdateRiskAssessmentInput {
                 ", publisherId='" + publisherId + '\'' +
                 ", title='" + title + '\'' +
                 ", taskDescription='" + taskDescription + '\'' +
-                ", hazards=" + hazards +
-                ", screeners=" + screeners +
                 ", riskAssessmentScheduleIds=" + riskAssessmentScheduleIds +
                 '}';
     }

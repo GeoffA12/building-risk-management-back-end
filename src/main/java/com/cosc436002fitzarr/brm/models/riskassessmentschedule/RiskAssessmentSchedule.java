@@ -6,7 +6,6 @@ import com.cosc436002fitzarr.brm.models.Entity;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -24,13 +23,15 @@ public class RiskAssessmentSchedule implements Entity {
     private List<String> siteMaintenanceAssociateIds;
     private Status status;
     private Long workOrder;
+    private List<Hazard> hazards;
+    private List<Screener> screeners;
     private RiskLevel riskLevel;
     private LocalDateTime dueDate;
 
     public RiskAssessmentSchedule(String id, LocalDateTime createdAt, LocalDateTime updatedAt, List<EntityTrail> entityTrail,
                                   String publisherId, String title, String riskAssessmentId, String buildingRiskAssessmentId,
-                                  List<String> siteMaintenanceAssociateIds, Status status, Long workOrder, RiskLevel riskLevel,
-                                  LocalDateTime dueDate) {
+                                  List<String> siteMaintenanceAssociateIds, Status status, Long workOrder, List<Hazard> hazards,
+                                  List<Screener> screeners, RiskLevel riskLevel, LocalDateTime dueDate) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -42,6 +43,8 @@ public class RiskAssessmentSchedule implements Entity {
         this.siteMaintenanceAssociateIds = siteMaintenanceAssociateIds;
         this.status = status;
         this.workOrder = workOrder;
+        this.hazards = hazards;
+        this.screeners = screeners;
         this.riskLevel = riskLevel;
         this.dueDate = dueDate;
     }
@@ -101,6 +104,14 @@ public class RiskAssessmentSchedule implements Entity {
     public void setWorkOrder(Long workOrder) {
         this.workOrder = workOrder;
     }
+
+    public List<Hazard> getHazards() { return hazards; }
+
+    public void setHazards(List<Hazard> hazards) { this.hazards = hazards; }
+
+    public List<Screener> getScreeners() { return screeners; }
+
+    public void setScreeners(List<Screener> screeners) { this.screeners = screeners; }
 
     public RiskLevel getRiskLevel() {
         return riskLevel;
@@ -165,12 +176,12 @@ public class RiskAssessmentSchedule implements Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RiskAssessmentSchedule that = (RiskAssessmentSchedule) o;
-        return getId().equals(that.getId()) && getCreatedAt().equals(that.getCreatedAt()) && getUpdatedAt().equals(that.getUpdatedAt()) && getEntityTrail().equals(that.getEntityTrail()) && getPublisherId().equals(that.getPublisherId()) && getTitle().equals(that.getTitle()) && getRiskAssessmentId().equals(that.getRiskAssessmentId()) && getBuildingRiskAssessmentId().equals(that.getBuildingRiskAssessmentId()) && getSiteMaintenanceAssociateIds().equals(that.getSiteMaintenanceAssociateIds()) && getStatus() == that.getStatus() && getWorkOrder().equals(that.getWorkOrder()) && getRiskLevel() == that.getRiskLevel() && getDueDate().equals(that.getDueDate());
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getCreatedAt(), that.getCreatedAt()) && Objects.equals(getUpdatedAt(), that.getUpdatedAt()) && Objects.equals(getEntityTrail(), that.getEntityTrail()) && Objects.equals(getPublisherId(), that.getPublisherId()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getRiskAssessmentId(), that.getRiskAssessmentId()) && Objects.equals(getBuildingRiskAssessmentId(), that.getBuildingRiskAssessmentId()) && Objects.equals(getSiteMaintenanceAssociateIds(), that.getSiteMaintenanceAssociateIds()) && getStatus() == that.getStatus() && Objects.equals(getWorkOrder(), that.getWorkOrder()) && Objects.equals(getHazards(), that.getHazards()) && Objects.equals(getScreeners(), that.getScreeners()) && getRiskLevel() == that.getRiskLevel() && Objects.equals(getDueDate(), that.getDueDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getTitle(), getRiskAssessmentId(), getBuildingRiskAssessmentId(), getSiteMaintenanceAssociateIds(), getStatus(), getWorkOrder(), getRiskLevel(), getDueDate());
+        return Objects.hash(getId(), getCreatedAt(), getUpdatedAt(), getEntityTrail(), getPublisherId(), getTitle(), getRiskAssessmentId(), getBuildingRiskAssessmentId(), getSiteMaintenanceAssociateIds(), getStatus(), getWorkOrder(), getHazards(), getScreeners(), getRiskLevel(), getDueDate());
     }
 
     @Override
@@ -187,6 +198,8 @@ public class RiskAssessmentSchedule implements Entity {
                 ", siteMaintenanceAssociateIds=" + siteMaintenanceAssociateIds +
                 ", status=" + status +
                 ", workOrder=" + workOrder +
+                ", hazards=" + hazards +
+                ", screeners=" + screeners +
                 ", riskLevel=" + riskLevel +
                 ", dueDate=" + dueDate +
                 '}';

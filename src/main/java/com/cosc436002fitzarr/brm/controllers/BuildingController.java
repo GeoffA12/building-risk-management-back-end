@@ -43,7 +43,7 @@ public class BuildingController {
         return "Deleted: " + deletedBuilding.toString() + " from building repository";
     }
 
-    @RequestMapping("/getBuildingsBySite")
+    @RequestMapping(value = "/getBuildingsByAssociatedSiteIds", consumes = "application/json", produces = "application/json")
     public List<Building> getAllBuildingsBySite(@RequestBody GetEntityBySiteInput input) {
         LOGGER.info(input.toString());
         return buildingService.getAllBuildingsBySite(input);

@@ -3,11 +3,7 @@ package com.cosc436002fitzarr.brm.services;
 import com.cosc436002fitzarr.brm.enums.Status;
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.AttachBuildingRiskAssessmentIdToRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.CreateRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetBulkRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.UpdateRiskAssessmentScheduleInput;
-import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.*;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.repositories.RiskAssessmentScheduleRepository;
 import org.slf4j.Logger;
@@ -20,6 +16,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RiskAssessmentScheduleService {
@@ -51,6 +48,8 @@ public class RiskAssessmentScheduleService {
             input.getSiteMaintenanceAssociateIds(),
             Status.IN_PROGRESS,
             input.getWorkOrder(),
+            input.getHazards(),
+            input.getScreeners(),
             input.getRiskLevel(),
             dueDate
         );
@@ -130,6 +129,8 @@ public class RiskAssessmentScheduleService {
             input.getCreateRiskAssessmentScheduleInput().getSiteMaintenanceAssociateIds(),
             updatedScheduleStatus,
             input.getCreateRiskAssessmentScheduleInput().getWorkOrder(),
+            input.getCreateRiskAssessmentScheduleInput().getHazards(),
+            input.getCreateRiskAssessmentScheduleInput().getScreeners(),
             input.getCreateRiskAssessmentScheduleInput().getRiskLevel(),
             updatedDueDate
         );
@@ -168,6 +169,14 @@ public class RiskAssessmentScheduleService {
 
     public RiskAssessmentSchedule deleteRiskAssessmentSchedule(String riskAssessmentScheduleId, String publisherId) {
         RiskAssessmentSchedule riskAssessmentScheduleToDelete = checkRiskAssessmentScheduleExists(riskAssessmentScheduleId);
+
+        // If we delete a risk assessment schedule we also need to update the id list of the risk assessment it was attached to and remove the schedule
+        // from any associates who were assigned to it.
+        riskAssessmentService.removeDeletedRiskAssessmentScheduleFromRiskAssessment(riskAssessmentScheduleToDelete.getRiskAssessmentId(), riskAssessmentScheduleToDelete.getId(), publisherId);
+        for (String siteMaintenanceAssociateId : riskAssessmentScheduleToDelete.getSiteMaintenanceAssociateIds()) {
+            siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentScheduleToDelete.getId(), publisherId);
+        }
+
         try {
             riskAssessmentScheduleRepository.deleteById(riskAssessmentScheduleToDelete.getId());
             LOGGER.info("Risk assessment schedule: " + riskAssessmentScheduleToDelete.toString() + " deleted from risk assessment schedule repository");
@@ -176,12 +185,6 @@ public class RiskAssessmentScheduleService {
             throw new RuntimeException(e);
         }
 
-        // If we delete a risk assessment schedule we also need to update the id list of the risk assessment it was attached to and remove the schedule
-        // from any associates who were assigned to it.
-        riskAssessmentService.removeDeletedRiskAssessmentScheduleFromRiskAssessment(riskAssessmentScheduleToDelete.getRiskAssessmentId(), riskAssessmentScheduleToDelete.getId(), publisherId);
-        for (String siteMaintenanceAssociateId : riskAssessmentScheduleToDelete.getSiteMaintenanceAssociateIds()) {
-            siteMaintenanceAssociateService.removeAssignedRiskAssessmentFromAssociate(siteMaintenanceAssociateId, riskAssessmentScheduleToDelete.getId(), publisherId);
-        }
         return riskAssessmentScheduleToDelete;
     }
 
@@ -256,9 +259,52 @@ public class RiskAssessmentScheduleService {
     public void deleteRiskAssessmentSchedulesFromDeletedBuildingRiskAssessment(String buildingRiskAssessmentId, String publisherId) {
         List<RiskAssessmentSchedule> riskAssessmentSchedulesOfBuildingRiskAssessment = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByBuildingRiskAssessmentId(buildingRiskAssessmentId);
 
+        LOGGER.info(riskAssessmentSchedulesOfBuildingRiskAssessment.toString());
         for (RiskAssessmentSchedule riskAssessmentSchedule : riskAssessmentSchedulesOfBuildingRiskAssessment) {
             deleteRiskAssessmentSchedule(riskAssessmentSchedule.getId(), publisherId);
         }
+    }
+
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceManager(List<String> riskAssessmentScheduleIds, Boolean activeSchedules) {
+        List<RiskAssessmentSchedule> riskAssessmentSchedulesOfMaintenanceManager = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(riskAssessmentScheduleIds);
+
+        return riskAssessmentSchedulesOfMaintenanceManager.stream()
+                .filter(riskAssessmentSchedule -> activeSchedules ? !riskAssessmentSchedule.getStatus().equals(Status.COMPLETE) : riskAssessmentSchedule.getStatus().equals(Status.COMPLETE))
+                .collect(Collectors.toList());
+    }
+
+    public RiskAssessmentSchedule submitRiskAssessmentSchedule(SubmitRiskAssessmentScheduleInput input) {
+        RiskAssessmentSchedule existingRiskAssessmentSchedule = checkRiskAssessmentScheduleExists(input.getId());
+
+        RiskAssessmentSchedule updatedRiskAssessmentSchedule = getUpdatedRiskAssessmentSchedule(existingRiskAssessmentSchedule.getId(), input.getPublisherId());
+
+        RiskAssessmentSchedule submittedRiskAssessmentScheduleForPersistence = new RiskAssessmentSchedule(
+            updatedRiskAssessmentSchedule.getId(),
+            updatedRiskAssessmentSchedule.getCreatedAt(),
+            updatedRiskAssessmentSchedule.getUpdatedAt(),
+            updatedRiskAssessmentSchedule.getEntityTrail(),
+            updatedRiskAssessmentSchedule.getPublisherId(),
+            updatedRiskAssessmentSchedule.getTitle(),
+            updatedRiskAssessmentSchedule.getRiskAssessmentId(),
+            updatedRiskAssessmentSchedule.getBuildingRiskAssessmentId(),
+            updatedRiskAssessmentSchedule.getSiteMaintenanceAssociateIds(),
+            Status.COMPLETE,
+            updatedRiskAssessmentSchedule.getWorkOrder(),
+            input.getHazards(),
+            input.getScreeners(),
+            input.getRiskLevel(),
+            updatedRiskAssessmentSchedule.getDueDate()
+        );
+
+        try {
+            riskAssessmentScheduleRepository.save(submittedRiskAssessmentScheduleForPersistence);
+            LOGGER.info("Successfully submitted risk assessment schedule: " + submittedRiskAssessmentScheduleForPersistence.toString() +
+                    " to the risk assessment schedule repository");
+        } catch (Exception e) {
+            LOGGER.info(e.toString());
+            throw new RuntimeException(e);
+        }
+        return submittedRiskAssessmentScheduleForPersistence;
     }
 
     public String getCreatedRiskAssessmentScheduleSystemComment() {

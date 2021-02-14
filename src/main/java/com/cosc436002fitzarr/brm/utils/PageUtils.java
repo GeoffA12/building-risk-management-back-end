@@ -1,5 +1,6 @@
 package com.cosc436002fitzarr.brm.utils;
 
+import com.cosc436002fitzarr.brm.models.buildingriskassessment.BuildingRiskAssessment;
 import com.cosc436002fitzarr.brm.models.riskassessment.RiskAssessment;
 import com.cosc436002fitzarr.brm.models.user.User;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import java.util.Map;
 public class PageUtils {
     private static final String userDataKey = "users";
     private static final String riskAssessmentDataKey = "riskassessments";
+    private static final String buildingRiskAssessmentDataKey = "buildingriskassessments";
     private static final String totalPagesKey = "totalPages";
     private static final String totalElementsKey = "totalElements";
     private static final String currentPageNumberKey = "currentPage";
@@ -30,6 +32,13 @@ public class PageUtils {
         responseMap.put(totalPagesKey, riskAssessmentsPage.getTotalPages());
         responseMap.put(totalElementsKey, filteredRiskAssessmentContent.size());
         responseMap.put(currentPageNumberKey, riskAssessmentsPage.getNumber());
+        return responseMap;
+    }
+
+    public static Map<String, Object> getBuildingRiskAssessmentMappingResponse(List<BuildingRiskAssessment> filteredBuildingRiskAssessmentContent) {
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put(buildingRiskAssessmentDataKey, filteredBuildingRiskAssessmentContent);
+        responseMap.put(totalElementsKey, filteredBuildingRiskAssessmentContent.size());
         return responseMap;
     }
 }

@@ -133,13 +133,7 @@ public class BuildingService {
     }
 
     public List<Building> getAllBuildingsBySite(GetEntityBySiteInput input) {
-        List<String> allSiteIds = input.getAssociatedSiteIds();
-        List<Building> matchingBuildingsBySiteId = new ArrayList<>();
-
-        for (String siteId : allSiteIds) {
-            matchingBuildingsBySiteId.addAll(buildingRepository.findBuildingsBySiteId(siteId));
-        }
-        return matchingBuildingsBySiteId;
+        return buildingRepository.findBuildingsByAssociatedSiteIds(input.getAssociatedSiteIds());
     }
 
     public void removeBuildingRiskAssessmentFromBuilding(String buildingId, String buildingRiskAssessmentId, String publisherId) {

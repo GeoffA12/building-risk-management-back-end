@@ -14,4 +14,6 @@ public interface SiteMaintenanceAssociateRepository extends MongoRepository<Site
 
     @Query(value = "{ '_id': { $in: ?0 } }")
     public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(List<String> siteMaintenanceAssociateIds);
+
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceManagerId(String siteMaintenanceManagerId);
 }

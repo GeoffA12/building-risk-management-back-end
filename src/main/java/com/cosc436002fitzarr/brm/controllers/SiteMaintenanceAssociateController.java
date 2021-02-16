@@ -47,4 +47,9 @@ public class SiteMaintenanceAssociateController {
         LOGGER.info(requestBody.toString());
         return siteMaintenanceAssociateService.getSiteMaintenanceAssociatesBySite(requestBody);
     }
+
+    @GetMapping(value = "/getSiteMaintenanceAssociatesBySiteMaintenanceManagerId")
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceManagerId(@RequestParam("siteMaintenanceManagerId") String siteMaintenanceManagerId) {
+        return siteMaintenanceAssociateService.getSiteMaintenanceAssociatesBySiteMaintenanceManagerId(siteMaintenanceManagerId);
+    }
 }

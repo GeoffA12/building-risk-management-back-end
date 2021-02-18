@@ -168,7 +168,7 @@ public class SiteMaintenanceManagerService {
             siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(siteMaintenanceAssociateId, userId);
         }
 
-        buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled(), userId);
+        buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled(), siteMaintenanceManagerToDelete.getId());
 
         siteMaintenanceManagerRepository.deleteById(siteMaintenanceManagerToDelete.getId());
         userRepository.deleteById(id);

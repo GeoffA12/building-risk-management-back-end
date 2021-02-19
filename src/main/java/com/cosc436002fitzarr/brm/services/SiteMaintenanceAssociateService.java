@@ -231,6 +231,10 @@ public class SiteMaintenanceAssociateService {
         return siteMaintenanceAssociateRepository.getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(siteMaintenanceAssociateIdList);
     }
 
+    public List<SiteMaintenanceAssociate> getSiteMaintenanceAssociatesBySiteMaintenanceManagerId(String siteMaintenanceManagerId) {
+        return siteMaintenanceAssociateRepository.getSiteMaintenanceAssociatesBySiteMaintenanceManagerId(siteMaintenanceManagerId);
+    }
+
     public String getSiteMaintenanceAssociateCreatedSystemComment() {
         return "SITE MAINTENANCE ASSOCIATE CREATED";
     }

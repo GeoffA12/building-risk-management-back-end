@@ -161,14 +161,19 @@ public class SiteMaintenanceManagerService {
         UserAPIHelper.checkUserNotDeletingThemselves(id, userId);
         SiteMaintenanceManager siteMaintenanceManagerToDelete = checkSiteMaintenanceManagerExists(id);
 
+        List<String> deletedAssociatedSiteIds = siteMaintenanceManagerToDelete.getAssociatedSiteIds();
+        siteService.removeAssociatedSiteIdsFromSites(deletedAssociatedSiteIds, siteMaintenanceManagerToDelete.getId(), userId);
+        List<String> siteMaintenanceAssociatesOfManager = siteMaintenanceManagerToDelete.getSiteMaintenanceAssociateIds();
+        for (String siteMaintenanceAssociateId : siteMaintenanceAssociatesOfManager) {
+            siteMaintenanceAssociateService.deleteSiteMaintenanceAssociate(siteMaintenanceAssociateId, userId);
+        }
+
+        buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled(), siteMaintenanceManagerToDelete.getId());
+
         siteMaintenanceManagerRepository.deleteById(siteMaintenanceManagerToDelete.getId());
         userRepository.deleteById(id);
         LOGGER.info("Site maintenance manager: " + siteMaintenanceManagerToDelete.toString() + " successfully fetched and deleted from site maintenance manager" +
                 " and user repositories");
-
-        List<String> deletedAssociatedSiteIds = siteMaintenanceManagerToDelete.getAssociatedSiteIds();
-        siteService.removeAssociatedSiteIdsFromSites(deletedAssociatedSiteIds, siteMaintenanceManagerToDelete.getId(), userId);
-        buildingRiskAssessmentService.deleteBuildingRiskAssessments(siteMaintenanceManagerToDelete.getBuildingRiskAssessmentIdsFiled(), userId);
         return siteMaintenanceManagerToDelete;
 
     }

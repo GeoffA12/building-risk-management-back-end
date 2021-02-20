@@ -2,6 +2,7 @@ package com.cosc436002fitzarr.brm.services;
 
 import com.cosc436002fitzarr.brm.models.EntityTrail;
 import com.cosc436002fitzarr.brm.models.riskassessmentschedule.RiskAssessmentSchedule;
+import com.cosc436002fitzarr.brm.models.riskassessmentschedule.input.GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput;
 import com.cosc436002fitzarr.brm.models.sitemaintenanceassociate.SiteMaintenanceAssociate;
 import com.cosc436002fitzarr.brm.models.sitemaintenancemanager.SiteMaintenanceManager;
 import com.cosc436002fitzarr.brm.models.user.input.CreateUserInput;
@@ -286,7 +287,7 @@ public class SiteMaintenanceManagerService {
         }
     }
 
-    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(String id, Boolean activeSchedules) {
+    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(String id) {
         SiteMaintenanceManager existingSiteMaintenanceManager = checkSiteMaintenanceManagerExists(id);
 
         List<SiteMaintenanceAssociate> siteMaintenanceAssociatesOfManager = siteMaintenanceAssociateService.getSiteMaintenanceAssociatesBySiteMaintenanceAssociateIdList(existingSiteMaintenanceManager.getSiteMaintenanceAssociateIds());
@@ -298,8 +299,8 @@ public class SiteMaintenanceManagerService {
         }
 
         List<String> uniqueRiskAssessmentScheduleIds = new ArrayList<>(riskAssessmentScheduleIds);
-
-        return riskAssessmentScheduleService.getRiskAssessmentSchedulesOfSiteMaintenanceManager(uniqueRiskAssessmentScheduleIds, activeSchedules);
+        GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput input = new GetRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsListInput(uniqueRiskAssessmentScheduleIds);
+        return riskAssessmentScheduleService.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(input);
     }
 
     public String getCreatedSiteMaintenanceManagerSystemComment() {

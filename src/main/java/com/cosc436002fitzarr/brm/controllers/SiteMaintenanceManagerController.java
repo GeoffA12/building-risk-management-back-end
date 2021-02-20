@@ -44,6 +44,6 @@ public class SiteMaintenanceManagerController {
 
     @GetMapping(value = "/getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager")
     public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(@RequestParam(name = "id") String id, @RequestParam(name = "activeSchedules") Boolean activeSchedules) {
-        return siteMaintenanceManagerService.getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(id, activeSchedules);
+        return siteMaintenanceManagerService.getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager(id);
     }
 }

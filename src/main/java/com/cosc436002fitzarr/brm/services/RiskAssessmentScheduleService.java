@@ -265,14 +265,6 @@ public class RiskAssessmentScheduleService {
         }
     }
 
-    public List<RiskAssessmentSchedule> getRiskAssessmentSchedulesOfSiteMaintenanceManager(List<String> riskAssessmentScheduleIds, Boolean activeSchedules) {
-        List<RiskAssessmentSchedule> riskAssessmentSchedulesOfMaintenanceManager = riskAssessmentScheduleRepository.getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList(riskAssessmentScheduleIds);
-
-        return riskAssessmentSchedulesOfMaintenanceManager.stream()
-                .filter(riskAssessmentSchedule -> activeSchedules ? !riskAssessmentSchedule.getStatus().equals(Status.COMPLETE) : riskAssessmentSchedule.getStatus().equals(Status.COMPLETE))
-                .collect(Collectors.toList());
-    }
-
     public RiskAssessmentSchedule submitRiskAssessmentSchedule(SubmitRiskAssessmentScheduleInput input) {
         RiskAssessmentSchedule existingRiskAssessmentSchedule = checkRiskAssessmentScheduleExists(input.getId());
 
